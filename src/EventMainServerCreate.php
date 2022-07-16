@@ -38,7 +38,7 @@ class EventMainServerCreate extends SplBean
     protected $crontabRunEnv = ['dev', 'test', 'produce'];
 
 
-    protected $hotReloadWatchDirs = [EASYSWOOLE_ROOT . '/App'];
+    protected $hotReloadWatchDirs = [EASYSWOOLE_ROOT . '/App'  , EASYSWOOLE_ROOT . '/vendor/kyzone'];
 
     /**
      * @var null ['key' => new EsNotify/Config([])]
