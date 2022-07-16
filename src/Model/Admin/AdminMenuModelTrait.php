@@ -20,11 +20,6 @@ trait AdminMenuModelTrait
 		return $data ? '/' . ltrim($data, '/') : '';
 	}
 
-	/*protected function setComponentAttr($data, $alldata)
-	{
-		return ltrim($data, '/');
-	}*/
-
 	protected function setNameAttr($data, $alldata)
 	{
 		return ucfirst(ltrim($data, '/'));

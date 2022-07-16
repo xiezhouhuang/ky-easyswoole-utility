@@ -2,7 +2,6 @@
 
 namespace Kyzone\EsUtility\HttpController\Admin;
 
-use App\HttpController\BaseController;
 use EasySwoole\Component\Timer;
 use EasySwoole\Http\Exception\FileException;
 use EasySwoole\ORM\AbstractModel;
@@ -15,12 +14,11 @@ use Kyzone\EsUtility\Common\Classes\DateUtils;
 use Kyzone\EsUtility\Common\Classes\LamJwt;
 use Kyzone\EsUtility\Common\Classes\XlsWriter;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
-use Kyzone\EsUtility\Common\Exception\SyncException;
 use Kyzone\EsUtility\Common\Http\Code;
 use Kyzone\EsUtility\Common\Languages\Dictionary;
 
 /**
- * @extends BaseController
+ * @extends \App\HttpController\BaseController
  */
 trait AdminAuthTrait
 {
@@ -35,7 +33,7 @@ trait AdminAuthTrait
 
     protected function onRequest(?string $action): ?bool
     {
-        $this->setAuthTraitProptected();
+        $this->setAuthTraitProtected();
 
         $return = parent::onRequest($action);
         if ( ! $return) {

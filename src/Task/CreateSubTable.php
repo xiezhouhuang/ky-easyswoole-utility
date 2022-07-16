@@ -91,8 +91,7 @@ class CreateSubTable implements TaskInterface
         catch (\EasySwoole\Mysqli\Exception\Exception | \Throwable $e)
         {
             $title = '创建分表失败';
-            dingtalk_text($title, "$title [$connectionName . $fullName] : " . $e->getMessage());
-            wechat_notice($title, $e->getMessage());
+            notice_txt($title, "$title [$connectionName . $fullName] : " . $e->getMessage());
             trace("$title [$connectionName . $fullName] : " . $e->getMessage(), 'error');
         }
     }

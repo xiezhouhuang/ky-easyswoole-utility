@@ -46,7 +46,7 @@ class Crontab extends AbstractCronTask
             if ( ! CronExpression::isValidExpression($value['rule'])) {
                 $msg = "id={$value['id']} 运行规则设置错误 {$value['rule']}";
                 trace($msg, 'error');
-                dingtalk_text($msg);
+                notice_txt($msg);
                 continue;
             }
 
@@ -62,7 +62,7 @@ class Crontab extends AbstractCronTask
             if ( ! is_array($args)) {
                 $msg = "定时任务参数解析失败: id={$value['id']},name={$value['name']},args=" . var_export($value['args'], true);
                 trace($msg, 'error');
-                dingtalk_text($msg);
+                notice_txt($msg);
                 continue;
             }
 

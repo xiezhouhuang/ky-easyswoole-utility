@@ -9,7 +9,7 @@ use Kyzone\EsUtility\Common\Http\Code;
 use Kyzone\EsUtility\Common\Languages\Dictionary;
 
 /**
- * @property \App\Model\Admin\Admin $Model
+ * @property \App\Model\Admin\AdminUser $Model
  */
 trait PublicTrait
 {
