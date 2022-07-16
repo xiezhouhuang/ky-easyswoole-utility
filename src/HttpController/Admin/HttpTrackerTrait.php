@@ -14,7 +14,7 @@ trait HttpTrackerTrait
 {
     protected function instanceModel()
     {
-        $this->Model = model_log($this->getStaticClassName());
+        $this->Model = model($this->getStaticClassName());
         return true;
     }
 
@@ -124,7 +124,7 @@ trait HttpTrackerTrait
             if ($return) {
                 throw $e;
             } else {
-                $this->error(Code::ERROR_OTHER, $e->getMessage());
+                $this->error($e->getMessage(), Code::ERROR_OTHER);
             }
 		}
 	}
@@ -166,7 +166,7 @@ trait HttpTrackerTrait
 			if ($return) {
                 throw $e;
             } else {
-                $this->error(Code::ERROR_OTHER, $e->getMessage());
+                $this->error($e->getMessage(), Code::ERROR_OTHER);
             }
 		}
 	}

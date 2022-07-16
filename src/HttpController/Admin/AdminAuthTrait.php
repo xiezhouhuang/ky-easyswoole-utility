@@ -54,7 +54,7 @@ trait AdminAuthTrait
     {
         $authorization = $this->getAuthorization();
         if ( ! $authorization) {
-            $this->error(Code::CODE_UNAUTHORIZED, Dictionary::ADMIN_AUTHTRAIT_1);
+            $this->error(Dictionary::ADMIN_AUTHTRAIT_1, Code::CODE_UNAUTHORIZED);
             return false;
         }
 
@@ -62,22 +62,22 @@ trait AdminAuthTrait
         $jwt = LamJwt::verifyToken($authorization, config('auth.jwtkey'));
         $id = $jwt['data']['id'] ?? '';
         if ($jwt['status'] != 1 || empty($id)) {
-            $this->error(Code::CODE_UNAUTHORIZED, Dictionary::ADMIN_AUTHTRAIT_2);
+            $this->error( Dictionary::ADMIN_AUTHTRAIT_2, Code::CODE_UNAUTHORIZED);
             return false;
         }
 
         // uid验证
         /** @var AbstractModel $Admin */
-        $Admin = model('AdminUserModel');
+        $Admin = model('admin_user');
         // 当前用户信息
         $data = $Admin->where('id', $id)->get();
         if (empty($data)) {
-            $this->error(Code::ERROR_OTHER, Dictionary::ADMIN_AUTHTRAIT_3);
+            $this->error(Dictionary::ADMIN_AUTHTRAIT_3,Code::ERROR_OTHER);
             return false;
         }
 
         if (empty($data['status']) && ( ! is_super($data['rid']))) {
-            $this->error(Code::ERROR_OTHER, Dictionary::ADMIN_AUTHTRAIT_4);
+            $this->error(Dictionary::ADMIN_AUTHTRAIT_4, Code::ERROR_OTHER);
             return false;
         }
 
@@ -107,7 +107,7 @@ trait AdminAuthTrait
 
         $currentAction = strtolower($this->getActionName());
         if ( ! in_array($currentAction, $publicMethods)) {
-            $this->error(Code::CODE_FORBIDDEN);
+            $this->error(Dictionary::PERMISSION_DENIED,Code::CODE_FORBIDDEN);
             return false;
         }
         $currentClassName = strtolower($this->getStaticClassName());
@@ -116,7 +116,7 @@ trait AdminAuthTrait
         // 设置用户权限
         $userMenu = $this->getUserMenus();
         if (empty($userMenu)) {
-            $this->error(Code::CODE_FORBIDDEN);
+            $this->error(Dictionary::PERMISSION_DENIED, Code::CODE_FORBIDDEN);
             return false;
         }
         $Menu = model('admin_menu');
@@ -161,7 +161,7 @@ trait AdminAuthTrait
 
         $ok = $policy->check($fullPath) === PolicyNode::EFFECT_ALLOW;
         if ( ! $ok) {
-            $this->error(Code::CODE_FORBIDDEN);
+            $this->error(Dictionary::PERMISSION_DENIED, Code::CODE_FORBIDDEN);
         }
         return $ok;
     }
@@ -224,7 +224,7 @@ trait AdminAuthTrait
             if ($return) {
                 return $result;
             } else {
-                $result ? $this->success() : $this->error(Code::ERROR_OTHER, Dictionary::ADMIN_AUTHTRAIT_6);
+                $result ? $this->success() : $this->error(Dictionary::ADMIN_AUTHTRAIT_6,Code::ERROR_OTHER);
             }
         }
     }
@@ -265,7 +265,7 @@ trait AdminAuthTrait
         if ($return) {
             return $model->toArray();
         } else {
-            $result ? $this->success() : $this->error(Code::ERROR_OTHER, Dictionary::ADMIN_AUTHTRAIT_14);
+            $result ? $this->success() : $this->error(Dictionary::ADMIN_AUTHTRAIT_14,Code::ERROR_OTHER);
         }
     }
 
@@ -275,7 +275,7 @@ trait AdminAuthTrait
         $pk = $this->Model->getPk();
         foreach ([$pk, 'column'] as $col) {
             if ( ! isset($post[$col]) || ! isset($post[$post['column']])) {
-                return $this->error(Code::ERROR_OTHER, Dictionary::ADMIN_AUTHTRAIT_15);
+                return $this->error(Dictionary::ADMIN_AUTHTRAIT_15, Code::ERROR_OTHER);
             }
         }
 

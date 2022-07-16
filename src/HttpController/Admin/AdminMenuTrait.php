@@ -39,7 +39,7 @@ trait MenuTrait
 		if ( ! empty($name)) {
 			$model = $this->Model->_clone();
 			if ($model->where('name', $name)->count()) {
-				return $this->error(Code::ERROR_OTHER, Dictionary::ADMIN_MENUTRAIT_1);
+				return $this->error(Dictionary::ADMIN_MENUTRAIT_1,Code::ERROR_OTHER);
 			}
 		}
 		return parent::_add($return);

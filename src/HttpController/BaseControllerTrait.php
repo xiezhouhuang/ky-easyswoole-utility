@@ -101,7 +101,7 @@ trait BaseControllerTrait
             // 交给异常处理器
             \EasySwoole\EasySwoole\Trigger::getInstance()->throwable($throwable);
         }
-		$this->error($throwable->getCode() ?: Code::CODE_INTERNAL_SERVER_ERROR, $message);
+		$this->error($message, $throwable->getCode() ?: Code::CODE_INTERNAL_SERVER_ERROR);
 	}
 
 	protected function success($result = null, $msg = null)
@@ -109,7 +109,7 @@ trait BaseControllerTrait
 		$this->writeJson(Code::CODE_OK, $result, $msg);
 	}
 
-	protected function error(int $code, $msg = null)
+	protected function error($msg = null, int $code = CODE::ERROR_OTHER)
 	{
 		$this->writeJson($code, [], $msg);
 	}
@@ -216,9 +216,9 @@ trait BaseControllerTrait
                 $this->$actionName();
 
             } catch (HttpParamException $e) {
-                $this->error(Code::ERROR_OTHER, $e->getMessage());
+                $this->error($e->getMessage(),Code::ERROR_OTHER);
             } catch (\Exception $e) {
-                $this->error(Code::CODE_INTERNAL_SERVER_ERROR, $e->getMessage());
+                $this->error($e->getMessage(),Code::CODE_INTERNAL_SERVER_ERROR);
             }
         } else {
             parent::actionNotFound($action);
