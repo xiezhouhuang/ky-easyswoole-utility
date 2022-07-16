@@ -126,7 +126,7 @@ trait BaseControllerTrait
 
 			$data = [
 				'code' => $statusCode,
-				'result' => $result,
+				'data' => $result,
 				'msg' => $msg ?? ''
 			];
 			$this->response()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
