@@ -12,7 +12,6 @@ use EasySwoole\RedisPool\RedisPool;
  */
 trait BaseModelTrait
 {
-	protected $gameid = '';
 
 	protected $sort = ['id' => 'desc'];
 
@@ -23,18 +22,15 @@ trait BaseModelTrait
 	protected $redisPoolname = 'default'; // redis连接池的标识
 	protected $destroyWhere = []; // 执行删除数据时的where值
 
-	public function __construct($data = [], $tabname = '', $gameid = '')
+	public function __construct($data = [], $tabname = '')
 	{
 		// $tabname > $this->tableName > $this->_getTable()
 		$tabname && $this->tableName = $tabname;
 		if ( ! $this->tableName) {
 			$this->tableName = $this->_getTable();
 		}
-
-		$this->gameid = $gameid;
-
-//        $this->autoTimeStamp = false;
-		$this->createTime = 'instime';
+		$this->autoTimeStamp = true;
+		$this->createTime = 'create_time';
 		$this->updateTime = false;
 		$this->setBaseTraitProptected();
 
@@ -181,13 +177,13 @@ trait BaseModelTrait
 		return $this;
 	}
 
-	public function setCreateTime($instime = 'instime')
+	public function setCreateTime($instime = 'create_time')
 	{
 		$this->createTime = $instime;
 		return $this;
 	}
 
-	public function setUpdateTime($updtime = 'updtime')
+	public function setUpdateTime($updtime = 'update_time')
 	{
 		$this->updateTime = $updtime;
 		return $this;
