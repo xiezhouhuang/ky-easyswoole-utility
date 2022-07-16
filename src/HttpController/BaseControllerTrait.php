@@ -106,12 +106,12 @@ trait BaseControllerTrait
 
 	protected function success($result = null, $msg = null)
 	{
-		$this->writeJson(Code::CODE_OK, $result, $msg);
+		return $this->writeJson(Code::CODE_OK, $result, $msg);
 	}
 
 	protected function error($msg = null, int $code = CODE::ERROR_OTHER)
 	{
-		$this->writeJson($code, [], $msg);
+		return $this->writeJson($code, [], $msg);
 	}
 
 	protected function writeJson($statusCode = 200, $result = null, $msg = null)
