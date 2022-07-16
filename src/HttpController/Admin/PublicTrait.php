@@ -15,7 +15,7 @@ trait PublicTrait
 {
     protected function instanceModel()
     {
-        $this->Model = model_admin('Admin');
+        $this->Model = model('admin_user');
         return true;
     }
 

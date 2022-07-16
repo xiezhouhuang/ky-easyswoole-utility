@@ -67,7 +67,7 @@ trait AdminBaseTrait
             $className = ucfirst($this->getStaticClassName());
 
             if ($this->modelName === '') {
-                $this->Model = model_admin($className, []);
+                $this->Model = model($className, []);
             } else {
                 $this->Model = model($this->modelName, []);
             }

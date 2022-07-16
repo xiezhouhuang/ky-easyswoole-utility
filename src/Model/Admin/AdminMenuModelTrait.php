@@ -78,8 +78,8 @@ trait AdminMenuModelTrait
 		$where = ['permission' => ['', '<>']];
 
 		if ( ! is_super($rid)) {
-			/** @var Role $Role */
-			$Role = model_admin('Role');
+			/** @var  \App\Model\Admin\AdminRole $Role */
+			$Role = model('admin_role');
 			$menuIds = $Role->where('id', $rid)->val('menu');
 			if (empty($menuIds)) {
 				return [];

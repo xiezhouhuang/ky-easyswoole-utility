@@ -33,23 +33,13 @@ trait AdminUserTrait
 
 	/**
 	 * @param false $return 是否返回数据，而不是输出
-	 * @param bool $gp game & package 是否查询游戏与包的数据
 	 * @return array
 	 */
-	public function _getUserInfo($return = false, $gp = true)
+	public function _getUserInfo($return = false)
 	{
-		$config = [
-			// 充值枚举
-			'pay' => config('pay')
-		];
-
+		
 		$config['sysinfo'] = sysinfo();
 
-		// 客户端进入页,应存id
-		if ( ! empty($this->operinfo['extension']['homePath'])) {
-			$Tree = new Tree();
-			$homePage = $Tree->originData(['type' => [[0, 1], 'in']])->getHomePath($this->operinfo['extension']['homePath']);
-		}
 		$avatar = $this->operinfo['avatar'] ?? '';
 
 		$super = $this->isSuper();
@@ -60,7 +50,6 @@ trait AdminUserTrait
 			'realname' => $this->operinfo['realname'],
 			'avatar' => $avatar,
 			'desc' => $this->operinfo['desc'] ?? '',
-			'homePath' => $homePage ?? '',
 			'roles' => [
 				[
 					'roleName' => $this->operinfo['role']['name'] ?? '',
@@ -68,40 +57,6 @@ trait AdminUserTrait
 				]
 			]
 		];
-
-		if($gp)
-		{
-			$gameids = $this->operinfo['extension']['gameids'] ?? [];
-			is_string($gameids) && $gameids = explode(',', $gameids);
-
-			// 默认选择游戏，管理员级别 > 系统级别
-			if (isset($config['sysinfo']['default_select_gameid']) && $config['sysinfo']['default_select_gameid'] !== '') {
-				// 权限
-				if ($super || in_array($config['sysinfo']['default_select_gameid'], $gameids)) {
-					$result['sleGid'] = $config['sysinfo']['default_select_gameid'];
-				}
-				// todo 设置多个，返回有权限的部分，前端如果是单选，要改为选中第一个
-			}
-			if (isset($this->operinfo['extension']['gid']) && $this->operinfo['extension']['gid'] !== '') {
-				$result['sleGid'] = $this->operinfo['extension']['gid'];
-			}
-
-			// 游戏和包
-			/** @var \App\Model\Admin\Game $Game */
-			$Game = model_admin('Game');
-			/** @var \App\Model\Admin\Package $Package */
-			$Package = model_admin('Package');
-			if ( ! $super) {
-				$Game->where(['id' => [$gameids, 'in']]);
-
-				$pkgbnd = $this->operinfo['extension']['pkgbnd'] ?? [];
-				is_string($pkgbnd) && $pkgbnd = explode(',', $pkgbnd);
-				$Package->where(['pkgbnd' => [$pkgbnd, 'in']]);
-			}
-
-			$result['gameList'] = $Game->where('status', 1)->setOrder()->field(['id', 'name'])->all();
-			$result['pkgList'] = $Package->field(['gameid', 'pkgbnd', 'name', 'id'])->setOrder()->all();
-		}
 
 		$result['config'] = $config;
 
@@ -113,8 +68,8 @@ trait AdminUserTrait
 	 */
 	public function _getPermCode($return = false)
 	{
-		/** @var \App\Model\Admin\Menu $model */
-		$model = model_admin('Menu');
+		/** @var \App\Model\Admin\AdminMenu $model */
+		$model = model('admin_menu');
 		$code = $model->permCode($this->operinfo['rid']);
 		return $return ? $code : $this->success($code);
 	}
@@ -135,8 +90,8 @@ trait AdminUserTrait
 			// role的关联数据也可以不用理会，ORM会处理
 			unset($userInfo['password'], $userInfo['role']);
 			// 默认首页treeSelect, 仅看有权限的菜单
-			/** @var \App\Model\Admin\Menu $Menu */
-			$Menu = model_admin('Menu');
+			/** @var \App\Model\Admin\AdminMenu $Menu */
+			$Menu = model('admin_enu');
 
 			$where = [];
 			$menus = $this->getUserMenus();
