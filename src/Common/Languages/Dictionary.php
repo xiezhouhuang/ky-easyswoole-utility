@@ -15,6 +15,7 @@ class Dictionary extends AbstractDictionary
 {
 	/******************** SDK *************************/
 	const SUCCESS = 'SUCCESS';
+	const OK = 'OK';
 	const FAIL = 'FAIL';
 	const ERROR = 'ERROR';
 

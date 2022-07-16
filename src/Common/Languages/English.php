@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Common\Languages;
+namespace Kyzone\EsUtility\Common\Languages;
 
 /**
  * 英文语言包
@@ -11,6 +11,7 @@ namespace App\Common\Languages;
 class English extends Dictionary
 {
     const SUCCESS = 'Success';
+    const OK = 'Success';
     const ERROR = 'Error';
     const FAIL = 'Fail';
 

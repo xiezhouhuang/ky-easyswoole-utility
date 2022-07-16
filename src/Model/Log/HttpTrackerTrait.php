@@ -11,7 +11,7 @@ trait HttpTrackerTrait
 	protected function setBaseTraitProptected()
 	{
 		$this->connectionName = 'log';
-		$this->sort = ['instime' => 'desc'];
+		$this->sort = ['create_time' => 'desc'];
 	}
 
 	// starttime和endtime是小数点后有四位的时间戳字符串,转为int毫秒时间戳
