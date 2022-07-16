@@ -9,12 +9,8 @@ use EasySwoole\Spl\SplArray;
 use EasySwoole\ORM\DbManager;
 use EasySwoole\ORM\AbstractModel;
 use EasySwoole\ORM\Db\MysqliClient;
-
-use WonderGame\EsNotify\DingTalk\Message\Markdown;
-use WonderGame\EsNotify\DingTalk\Message\Text;
-use WonderGame\EsNotify\EsNotify;
-use WonderGame\EsNotify\WeChat\Message\Notice;
-use WonderGame\EsNotify\WeChat\Message\Warning;
+use Kyzone\EsNotify\DingTalk\Message\Markdown;
+use Kyzone\EsNotify\DingTalk\Message\Text;
 use Kyzone\EsUtility\Common\Classes\LamJwt;
 use Kyzone\EsUtility\Common\Classes\Mysqli;
 
@@ -112,33 +108,6 @@ if ( ! function_exists('model')) {
         return $model;
     }
 }
-
-if ( ! function_exists('model_admin')) {
-    /**
-     * @param string $name
-     * @param array $data
-     * @param bool|numeric $inject
-     * @return \EasySwoole\ORM\AbstractModel
-     */
-	function model_admin(string $name = '', array $data = [], $inject = false)
-	{
-		return model('Admin\\' . ucfirst($name), $data, $inject);
-	}
-}
-
-if ( ! function_exists('model_log')) {
-    /**
-     * @param string $name
-     * @param array $data
-     * @param bool|numeric $inject
-     * @return \EasySwoole\ORM\AbstractModel
-     */
-	function model_log(string $name = '', array $data = [], $inject = false)
-	{
-		return model('Log\\' . ucfirst($name), $data, $inject);
-	}
-}
-
 if ( ! function_exists('config')) {
 	/**
 	 * 获取和设置配置参数
@@ -430,57 +399,6 @@ if ( ! function_exists('lang')) {
 	function lang($const = '')
 	{
 		return I18N::getInstance()->translate($const);
-	}
-}
-
-
-if ( ! function_exists('wechat_notice')) {
-	function wechat_notice($title = '', $content = '', $color = '#32CD32')
-	{
-		EsNotify::getInstance()->doesOne('wechat', new Notice([
-			'templateId' => config('WX_TPLID.notice'),
-			'title' => $title,
-			'content' => $content,
-			'color' => $color
-		]));
-	}
-}
-
-
-if ( ! function_exists('wechat_warning')) {
-	function wechat_warning($file, $line, $servername, $message, $color = '#FF0000')
-	{
-		EsNotify::getInstance()->doesOne('wechat', new Warning([
-			'templateId' => config('WX_TPLID.warning'),
-			'file' => $file,
-			'line' => $line,
-			'servername' => $servername,
-			'message' => $message,
-			'color' => $color
-		]));
-	}
-}
-
-
-if ( ! function_exists('dingtalk_text')) {
-	function dingtalk_text($content = '', $at = true)
-	{
-		EsNotify::getInstance()->doesOne('dingtalk', new Text([
-			'content' => $content,
-			'isAtAll' => $at
-		]));
-	}
-}
-
-
-if ( ! function_exists('dingtalk_markdown')) {
-	function dingtalk_markdown($title = '', $text = '', $at = true)
-	{
-		EsNotify::getInstance()->doesOne('dingtalk', new Markdown([
-			'title' => $title,
-			'text' => $text,
-			'isAtAll' => $at
-		]));
 	}
 }
 
@@ -778,19 +696,4 @@ if ( ! function_exists('memory_convert')) {
 
 		return sprintf('%.2f ' . $s[$e], ($bytes / pow(1024, floor($e))));
 	}
-}
-
-if ( ! function_exists('json_decode_ext'))
-{
-    /**
-     * json_decode的加强版，自动将extension字段处理为数组类型
-     * @param string $data
-     * @return array|mixed|string
-     */
-    function json_decode_ext($data = '')
-    {
-        $data = is_scalar($data) ? json_decode($data, true) : $data;
-        is_array($data) && isset($data['extension']) && ! is_array($data['extension']) && ($data['extension'] = json_decode($data['extension'], true));
-        return $data;
-    }
 }

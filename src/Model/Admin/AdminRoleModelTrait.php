@@ -4,7 +4,7 @@ namespace Kyzone\EsUtility\Model\Admin;
 
 use EasySwoole\ORM\AbstractModel;
 
-trait RoleModelTrait
+trait AdminRoleModelTrait
 {
 	protected function setBaseTraitProptected()
 	{

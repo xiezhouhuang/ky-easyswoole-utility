@@ -11,7 +11,7 @@ use Kyzone\EsUtility\Common\Languages\Dictionary;
 /**
  * @property \App\Model\Admin\Admin $Model
  */
-trait PubTrait
+trait PublicTrait
 {
     protected function instanceModel()
     {

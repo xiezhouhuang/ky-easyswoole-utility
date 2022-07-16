@@ -22,19 +22,9 @@ use Kyzone\EsUtility\Common\Languages\Dictionary;
 /**
  * @extends BaseController
  */
-trait AuthTrait
+trait AdminAuthTrait
 {
     protected $operinfo = [];
-
-    protected $uploadKey = 'file';
-
-    /////////////////////////////////////////////////////////////////////////
-    /// 权限认证相关属性                                                    ///
-    ///     1. 子类无需担心重写覆盖，校验时会反射获取父类属性值，并做合并操作     ///
-    ///     2. 对于特殊场景也可直接重写 setPolicy 方法操作Policy              ///
-    ///     3. 大小写不敏感                                                 ///
-    /////////////////////////////////////////////////////////////////////////
-
     // 别名认证
     protected array $_authAlias = ['change' => 'edit', 'export' => 'index'];
 
@@ -182,23 +172,6 @@ trait AuthTrait
     protected function setPolicy(Policy $policy)
     {
 
-    }
-
-    protected function setDbTimeZone(MysqliClient $client, $tzn)
-    {
-        $tznsql = ($tzn > 0 ? "+$tzn" : $tzn) . ':00';
-        $sql = "set time_zone = '$tznsql';";
-        trace($sql, 'info', 'sql');
-        $client->rawQuery($sql);
-    }
-
-    protected function getDbTimeZone(MysqliClient $client, $debug = true)
-    {
-        $timeZone = $client->rawQuery("SHOW VARIABLES LIKE '%time_zone%'");
-        if ($debug) {
-            var_dump($timeZone);
-        }
-        return $timeZone;
     }
 
     protected function isSuper($rid = null)
@@ -438,58 +411,6 @@ trait AuthTrait
         });
     }
 
-    public function upload()
-    {
-        try {
-            /** @var \EasySwoole\Http\Message\UploadFile $file */
-            $file = $this->request()->getUploadedFile($this->uploadKey);
-
-            // todo 文件校验
-            $fileType = $file->getClientMediaType();
-
-            $clientFileName = $file->getClientFilename();
-            $arr = explode('.', $clientFileName);
-            $suffix = end($arr);
-
-            $ymd = date(DateUtils::_ymd);
-            $join = "/{$ymd}/";
-
-            $dir = rtrim(config('UPLOAD.dir'), '/') . $join;
-            // 当前控制器名做前缀
-            $arr = explode('\\', static::class);
-            $prefix = end($arr);
-            $fileName = uniqid($prefix . '_', true) . '.' . $suffix;
-
-            $fullPath = $dir . $fileName;
-            $file->moveTo($fullPath);
-//            chmod($fullPath, 0777);
-
-            $url = $join . $fileName;
-            $this->writeUpload($url);
-        } catch (FileException $e) {
-            $this->writeUpload('', Code::ERROR_OTHER, $e->getMessage());
-        }
-    }
-
-    public function unlink()
-    {
-//        $suffix = pathinfo($this->post['url'], PATHINFO_EXTENSION);
-//        $info = pathinfo($this->post['url']);
-//        $filename = $info['basename'];
-//        // todo 文件校验, 比如子类为哪个控制器，只允许删除此前缀的
-//        $suffix = $info['extension'];
-//
-//        // 指定目录
-//        $dir = rtrim(config('UPLOAD.dir'), '/') . '/images/';
-//
-//        $file = $dir . $filename;
-//        if (is_file($file))
-//        {
-//            @unlink($file);
-//        }
-        $this->success();
-    }
-
     /**
      * 构造查询数据
      * 可在具体的控制器的【基本组件里(即：use xxxTrait 的 xxxTrait里)】重写此方法以实现如有个性化的搜索条件
@@ -537,36 +458,6 @@ trait AuthTrait
             $filter['endtime'] = strtotime($this->get['endtime']);
             $filter['endday'] = date(DateUtils::_ymd, $filter['endtime']);
         }
-
-        // gameid, pkgbnd
-        // 对应extension字段
-        $extColName = ['gameid' => 'gameids', 'pkgbnd' => 'pkgbnd'];
-        foreach (['gameid', 'pkgbnd'] as $col) {
-            if (isset($this->get[$col])) {
-                $value = $this->get[$col];
-                $value = explode(',', $value);
-                $filter[$col] = $value;
-            } // 非超级管理员只允许有权限的
-            elseif ( ! $this->isSuper()) {
-                $filter[$col] = $this->operinfo['extension'][$extColName[$col]] ?? [];
-            }
-        }
-
-        /**
-         * 广告
-         * ads: 1-不限制,0-读adid数组
-         * adid: ['aaa', 'bbb', 'ccc']
-         */
-        if (empty($this->get['adid']) && ! $this->isSuper()) {
-            // 限制adid
-            if (isset($this->operinfo['extension']['ads']) && $this->operinfo['extension']['ads'] != 1) {
-                $this->get['adid'] = $this->operinfo['extension']['adid'] ?? [];
-            }
-        }
-        if (isset($this->get['adid']) && is_string($this->get['adid'])) {
-            $this->get['adid'] = explode(',', $this->get['adid']);
-        }
-
         return $filter + $this->get;
     }
 

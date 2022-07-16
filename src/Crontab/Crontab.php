@@ -155,7 +155,7 @@ class Crontab extends AbstractCronTask
         }
         // 异步任务模板类
         if ($className && strpos($className, '\\') === false) {
-            $className = '\\WonderGame\\EsUtility\\Task\\' . ucfirst($className);
+            $className = '\\Kyzone\\EsUtility\\Task\\' . ucfirst($className);
         }
 
         if ( ! class_exists($className) || ( ! $className instanceof TaskInterface)) {

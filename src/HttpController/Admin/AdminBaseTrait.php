@@ -11,7 +11,7 @@ use Kyzone\EsUtility\HttpController\BaseControllerTrait;
 /**
  * @extends BaseControllerTrait
  */
-trait BaseTrait
+trait AdminBaseTrait
 {
 	/** @var AbstractModel $Model */
 	protected $Model;
@@ -57,21 +57,6 @@ trait BaseTrait
 		return $authorization;
 	}
 
-	protected function success($result = null, $msg = null)
-	{
-		// 合计行antdv的rowKey
-		$name = config('fetchSetting.footerField');
-		// 合计行为二维数组
-		if (isset($result[$name]) && is_array($result[$name])) {
-			$date = date(DateUtils::YmdHis);
-			$result[$name] = array_map(function ($value) use ($date) {
-				$value['key'] = strval($value['key'] ?? ($date . uniqid(true)));
-				return $value;
-			}, $result[$name]);
-		}
-		$this->writeJson(Code::CODE_OK, $result, $msg);
-	}
-
     /**
      * 如果GET有传tzn参数，自动注入连接并切时区
      * @return bool
@@ -82,9 +67,9 @@ trait BaseTrait
             $className = ucfirst($this->getStaticClassName());
 
             if ($this->modelName === '') {
-                $this->Model = model_admin($className, [], $this->get['tzn']);
+                $this->Model = model_admin($className, []);
             } else {
-                $this->Model = model($this->modelName, [], $this->get['tzn']);
+                $this->Model = model($this->modelName, []);
             }
         }
         return true;

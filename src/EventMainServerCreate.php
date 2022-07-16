@@ -7,8 +7,8 @@ use EasySwoole\EasySwoole\ServerManager;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\Socket\AbstractInterface\ParserInterface;
 use EasySwoole\Spl\SplBean;
-use WonderGame\EsNotify\EsNotify;
-use WonderGame\EsNotify\Interfaces\ConfigInterface;
+use Kyzone\EsNotify\EsNotify;
+use Kyzone\EsNotify\Interfaces\ConfigInterface;
 
 class EventMainServerCreate extends SplBean
 {
@@ -35,10 +35,10 @@ class EventMainServerCreate extends SplBean
      * @var null
      */
     protected $crontabClass = Crontab\Crontab::class;
-    protected $crontabRunEnv = ['dev', 'produce'];
+    protected $crontabRunEnv = ['dev', 'test', 'produce'];
 
 
-    protected $hotReloadWatchDirs = [EASYSWOOLE_ROOT . '/App', EASYSWOOLE_ROOT . '/vendor/wonder-game'];
+    protected $hotReloadWatchDirs = [EASYSWOOLE_ROOT . '/App'];
 
     /**
      * @var null ['key' => new EsNotify/Config([])]

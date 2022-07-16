@@ -14,24 +14,10 @@ use EasySwoole\I18N\AbstractDictionary;
 class Dictionary extends AbstractDictionary
 {
 	/******************** SDK *************************/
-	const CANT_FIND_PKG = 'CANT_FIND_PKG';
-	const MISS_KEY_PARA = 'MISS_KEY_PARA';
 	const SUCCESS = 'SUCCESS';
 	const FAIL = 'FAIL';
 	const ERROR = 'ERROR';
-	const VENDOR_TYPE_ERR = 'VENDOR_TYPE_ERR';
-	const VENDOR_NOT_BINDED = 'VENDOR_NOT_BINDED';
-	const VENDOR_HAD_BINDED = 'VENDOR_HAD_BINDED';
-	const LOSE_TOKEN = 'LOSE_TOKEN';
-	const JWT_ERR = 'JWT_ERR';
-	const CANT_FIND_USER = 'CANT_FIND_USER';
-	const HUAWEI_API_FAIL = 'HUAWEI_API_FAIL';
-	const HUAWEI_RES_FAIL = 'HUAWEI_RES_FAIL';
-	const CIPHER_ERR = 'CIPHER_ERR';
-	const PROTOCAL_ERR = 'PROTOCAL_ERR';
-	const CANCEL_CLOSE = 'CANCEL_CLOSE';
-	const PAYSUCCESS = 'PAYSUCCESS';
-	const PREPARING = 'PREPARING';
+
 	
 	/**************** 命名规则: 除最后一个_后表示数量，前面的皆表示目录分割 ******************/
 	// 网络错误
@@ -56,8 +42,8 @@ class Dictionary extends AbstractDictionary
 	const ADMIN_AUTHTRAIT_17 = 'ADMIN_AUTHTRAIT_17';
 	const ADMIN_AUTHTRAIT_18 = 'ADMIN_AUTHTRAIT_18';
 
-//    const ADMIN_ADMINTRAIT_1 = 'ADMIN_ADMINTRAIT_1';
-//    const ADMIN_ADMINTRAIT_2 = 'ADMIN_ADMINTRAIT_2';
+    const ADMIN_ADMINTRAIT_1 = 'ADMIN_ADMINTRAIT_1';
+    const ADMIN_ADMINTRAIT_2 = 'ADMIN_ADMINTRAIT_2';
 	const ADMIN_ADMINTRAIT_3 = 'ADMIN_ADMINTRAIT_3';
 	const ADMIN_ADMINTRAIT_4 = 'ADMIN_ADMINTRAIT_4';
 	const ADMIN_ADMINTRAIT_5 = 'ADMIN_ADMINTRAIT_5';

@@ -190,37 +190,8 @@ class EventInitialize extends SplBean
                     trace($sql, 'info', 'sql');
                 }
 
-                // 不记录的SQL，表名
-                $logtable = config('NOT_WRITE_SQL.table');
-                if (is_array($logtable)) {
-                    foreach($logtable as $v) {
-                        if (
-                            strpos($sql, "`$v`")
-                            ||
-                            // 支持  XXX*这种模糊匹配
-                            (strpos($v, '*') && strpos($sql, '`' . str_replace('*', '', $v)))
-                        )
-                        {
-                            return;
-                        }
-                    }
-                }
-                // 不记录的SQL，正则
-                $not = config('NOT_WRITE_SQL.pattern');
-                if (is_array($not)) {
-                    foreach ($not as $pattern) {
-                        if (preg_match($pattern, $sql)) {
-                            return;
-                        }
-                    }
-                }
-
                 if (is_callable($this->mysqlOnQueryFunc['_save_sql'])) {
                     $this->mysqlOnQueryFunc['_save_sql']($sql);
-                } else {
-                    /** @var \App\Model\Admin\LogSql $Log */
-                    $Log = model_admin('LogSql');
-                    $Log->sqlWriteLog($sql);
                 }
 
                 // 后置
