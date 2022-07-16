@@ -9,7 +9,7 @@ use Kyzone\EsUtility\Common\Languages\Dictionary;
 /**
  * @property \App\Model\Admin\Admin $Model
  */
-trait AdminUsersTrait
+trait AdminUserTrait
 {
     protected function __search()
     {

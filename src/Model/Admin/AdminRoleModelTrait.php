@@ -6,8 +6,10 @@ use EasySwoole\ORM\AbstractModel;
 
 trait AdminRoleModelTrait
 {
-	protected function setBaseTraitProptected()
+	protected function setBaseTraitProtected()
 	{
+		$this->tableName = 'admin_role';
+		$this->autoTimeStamp = true;
 		$this->sort = ['sort' => 'asc', 'id' => 'asc'];
 	}
 

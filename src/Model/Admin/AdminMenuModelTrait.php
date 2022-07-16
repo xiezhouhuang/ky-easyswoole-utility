@@ -8,10 +8,11 @@ use Kyzone\EsUtility\Common\Classes\Tree;
 /**
  * @extends AbstractModel
  */
-trait MenuModelTrait
+trait AdminMenuModelTrait
 {
-	protected function setBaseTraitProptected()
+	protected function setBaseTraitProtected()
 	{
+		$this->tableName = 'admin_menu';
 		$this->sort = ['sort' => 'asc', 'id' => 'desc'];
 	}
 

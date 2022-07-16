@@ -24,20 +24,18 @@ trait BaseModelTrait
 
 	public function __construct($data = [], $tabname = '')
 	{
-		// $tabname > $this->tableName > $this->_getTable()
 		$tabname && $this->tableName = $tabname;
 		if ( ! $this->tableName) {
 			$this->tableName = $this->_getTable();
 		}
-		$this->autoTimeStamp = true;
 		$this->createTime = 'create_time';
 		$this->updateTime = false;
-		$this->setBaseTraitProptected();
+		$this->setBaseTraitProtected();
 
 		parent::__construct($data);
 	}
 
-	protected function setBaseTraitProptected()
+	protected function setBaseTraitProtected()
 	{
 	}
 
@@ -54,29 +52,6 @@ trait BaseModelTrait
 	public function getPk()
 	{
 		return $this->schemaInfo()->getPkFiledName();
-	}
-
-	protected function getExtensionAttr($extension = '', $alldata = [])
-	{
-		return is_array($extension) ? $extension : json_decode($extension, true);
-	}
-
-	/**
-	 * 数据写入前对extension字段的值进行处理
-	 * @access protected
-	 * @param array $extension 原数据
-	 * @param bool $encode 是否强制编码
-	 * @return string 处理后的值
-	 */
-	protected function setExtensionAttr($extension = [], $alldata = [])
-	{
-		if (is_string($extension)) {
-			$extension = json_decode($extension, true);
-			if ( ! $extension) {
-				return json_encode(new \stdClass());
-			}
-		}
-		return json_encode($extension);
 	}
 
 	protected function getIpAttr($ip = [], $data = [])

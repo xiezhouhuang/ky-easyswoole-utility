@@ -4,7 +4,7 @@ namespace Kyzone\EsUtility\Model\Admin;
 
 use EasySwoole\Mysqli\QueryBuilder;
 
-trait AdminModelTrait
+trait AdminUserModelTrait
 {
 	/**
 	 * 保存登录日志，新项目将log表统一命名规则，自己实现记录日志的操作
@@ -14,9 +14,10 @@ trait AdminModelTrait
 	 */
 	abstract public function signInLog($data = []);
 
-	protected function setBaseTraitProptected()
+	protected function setBaseTraitProtected()
 	{
 		$this->autoTimeStamp = true;
+		$this->tableName = 'admin_user';
 		$this->sort = ['sort' => 'asc', 'id' => 'asc'];
 	}
 
@@ -34,6 +35,6 @@ trait AdminModelTrait
 	 */
 	public function relation()
 	{
-		return $this->hasOne(find_model('Admin\Role'), null, 'rid', 'id');
+		return $this->hasOne(find_model('Admin\AdminRoleModel'), null, 'rid', 'id');
 	}
 }
