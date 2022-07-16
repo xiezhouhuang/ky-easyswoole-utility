@@ -7,7 +7,6 @@ use EasySwoole\EasySwoole\Config;
 use EasySwoole\EasySwoole\SysConst;
 use EasySwoole\Http\Request;
 use EasySwoole\Http\Response;
-use EasySwoole\I18N\I18N;
 use EasySwoole\ORM\DbManager;
 use EasySwoole\Spl\SplBean;
 use EasySwoole\Trigger\TriggerInterface;
@@ -43,7 +42,6 @@ class EventInitialize extends SplBean
         '_after_func' => null, // 后置
     ];
 
-    protected $languageConfig = null;
 
     protected $httpOnRequestOpen = true;
     protected $httpOnRequestFunc = [
@@ -77,9 +75,6 @@ class EventInitialize extends SplBean
             $this->redisConfig = config('REDIS');
         }
 
-        if (is_null($this->languageConfig)) {
-            $this->languageConfig = config('LANGUAGES') ?: [];
-        }
     }
 
     public function run()
@@ -89,7 +84,6 @@ class EventInitialize extends SplBean
         $this->registerMysqlPool();
         $this->registerRedisPool();
         $this->registerMysqlOnQuery();
-        $this->registerI18n();
         $this->registerHttpOnRequest();
         $this->registerAfterRequest();
     }
@@ -202,32 +196,6 @@ class EventInitialize extends SplBean
         );
     }
 
-    /**
-     * 注册I18n国际化
-     * @return void
-     */
-    protected function registerI18n()
-    {
-        $languages = $this->languageConfig;
-        if ( ! is_array($languages)) {
-            return;
-        }
-        foreach ($languages as $lang => $language)
-        {
-            $className = $language['class'];
-            if ( ! class_exists($className)) {
-                continue;
-            }
-            I18N::getInstance()->addLanguage(new $className(), $lang);
-            if (isset($language['default']) && $language['default'] === true) {
-                I18N::getInstance()->setDefaultLanguage($lang);
-            }
-        }
-        // ini优先级比Config.default高
-        if (($iniLang = get_cfg_var('env.language')) && in_array($iniLang, array_keys($languages))) {
-            I18N::getInstance()->setDefaultLanguage($iniLang);
-        }
-    }
 
     /**
      * 注册Http全局Request回调
@@ -251,7 +219,6 @@ class EventInitialize extends SplBean
                 // 自定义协程单例Request
                 CtxRequest::getInstance()->request = $request;
 
-                LamUnit::setI18n($request);
 
                 if ( ! is_null($this->httpTracker)) {
                     $repeated = intval(stripos($request->getHeaderLine('user-agent'), ';HttpTracker') !== false);

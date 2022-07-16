@@ -15,7 +15,6 @@ use Kyzone\EsUtility\Common\Classes\LamJwt;
 use Kyzone\EsUtility\Common\Classes\XlsWriter;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
 use Kyzone\EsUtility\Common\Http\Code;
-use Kyzone\EsUtility\Common\Languages\Dictionary;
 
 /**
  * @extends \App\HttpController\BaseController
@@ -36,7 +35,7 @@ trait AdminAuthTrait
         $this->setAuthTraitProtected();
 
         $return = parent::onRequest($action);
-        if ( ! $return) {
+        if (!$return) {
             return false;
         }
 
@@ -51,8 +50,8 @@ trait AdminAuthTrait
     protected function checkAuthorization()
     {
         $authorization = $this->getAuthorization();
-        if ( ! $authorization) {
-            $this->error(Dictionary::ADMIN_AUTHTRAIT_1, Code::CODE_UNAUTHORIZED);
+        if (!$authorization) {
+            $this->error("缺少token，请重新登录", Code::CODE_UNAUTHORIZED);
             return false;
         }
 
@@ -60,7 +59,7 @@ trait AdminAuthTrait
         $jwt = LamJwt::verifyToken($authorization, config('auth.jwtkey'));
         $id = $jwt['data']['id'] ?? '';
         if ($jwt['status'] != 1 || empty($id)) {
-            $this->error( Dictionary::ADMIN_AUTHTRAIT_2, Code::CODE_UNAUTHORIZED);
+            $this->error("token过期，请重新登录", Code::CODE_UNAUTHORIZED);
             return false;
         }
 
@@ -70,12 +69,12 @@ trait AdminAuthTrait
         // 当前用户信息
         $data = $Admin->where('id', $id)->get();
         if (empty($data)) {
-            $this->error(Dictionary::ADMIN_AUTHTRAIT_3,Code::ERROR_OTHER);
+            $this->error("管理员id不正确", Code::ERROR_OTHER);
             return false;
         }
 
-        if (empty($data['status']) && ( ! is_super($data['rid']))) {
-            $this->error(Dictionary::ADMIN_AUTHTRAIT_4, Code::ERROR_OTHER);
+        if (empty($data['status']) && (!is_super($data['rid']))) {
+            $this->error("管理员已被封禁", Code::ERROR_OTHER);
             return false;
         }
 
@@ -104,8 +103,8 @@ trait AdminAuthTrait
         $publicMethods = $this->getAllowMethods('strtolower');
 
         $currentAction = strtolower($this->getActionName());
-        if ( ! in_array($currentAction, $publicMethods)) {
-            $this->error(Dictionary::PERMISSION_DENIED,Code::CODE_FORBIDDEN);
+        if (!in_array($currentAction, $publicMethods)) {
+            $this->error("对不起，没有权限", Code::CODE_FORBIDDEN);
             return false;
         }
         $currentClassName = strtolower($this->getStaticClassName());
@@ -114,7 +113,7 @@ trait AdminAuthTrait
         // 设置用户权限
         $userMenu = $this->getUserMenus();
         if (empty($userMenu)) {
-            $this->error(Dictionary::PERMISSION_DENIED, Code::CODE_FORBIDDEN);
+            $this->error("对不起，没有权限", Code::CODE_FORBIDDEN);
             return false;
         }
         $Menu = model('admin_menu');
@@ -158,8 +157,8 @@ trait AdminAuthTrait
         $this->setPolicy($policy);
 
         $ok = $policy->check($fullPath) === PolicyNode::EFFECT_ALLOW;
-        if ( ! $ok) {
-            $this->error(Dictionary::PERMISSION_DENIED, Code::CODE_FORBIDDEN);
+        if (!$ok) {
+            $this->error("对不起，没有权限", Code::CODE_FORBIDDEN);
         }
         return $ok;
     }
@@ -186,8 +185,7 @@ trait AdminAuthTrait
 
     protected function ifRunBeforeAction()
     {
-        foreach (['__before__common', '__before_' . $this->getActionName()] as $beforeAction)
-        {
+        foreach (['__before__common', '__before_' . $this->getActionName()] as $beforeAction) {
             if (method_exists(static::class, $beforeAction)) {
                 $this->$beforeAction();
             }
@@ -198,18 +196,18 @@ trait AdminAuthTrait
     {
         $request = array_merge($this->get, $this->post);
 
-        if ( ! $this->Model instanceof AbstractModel) {
+        if (!$this->Model instanceof AbstractModel) {
             throw new HttpParamException('Model Not instanceof AbstractModel !');
         }
 
         $pk = $this->Model->getPk();
         // 不排除id为0的情况
-        if ( ! isset($request[$pk]) || $request[$pk] === '') {
-            throw new HttpParamException(lang(Dictionary::ADMIN_AUTHTRAIT_10));
+        if (!isset($request[$pk]) || $request[$pk] === '') {
+            throw new HttpParamException("缺少主键");
         }
         $model = $this->Model->where($pk, $request[$pk])->get();
         if (empty($model)) {
-            throw new HttpParamException(lang(Dictionary::ADMIN_AUTHTRAIT_11));
+            throw new HttpParamException("错误的主键");
         }
 
         return $model;
@@ -222,7 +220,7 @@ trait AdminAuthTrait
             if ($return) {
                 return $result;
             } else {
-                $result ? $this->success() : $this->error(Dictionary::ADMIN_AUTHTRAIT_6,Code::ERROR_OTHER);
+                $result ? $this->success() : $this->error("添加失败", Code::ERROR_OTHER);
             }
         }
     }
@@ -249,7 +247,7 @@ trait AdminAuthTrait
             $upd = $model->update($request, $where);
             if ($upd === false) {
                 trace('edit update失败: ' . $model->lastQueryResult()->getLastError());
-                throw new HttpParamException(lang(Dictionary::ADMIN_AUTHTRAIT_9));
+                throw new HttpParamException("编辑失败");
             }
         }
 
@@ -263,7 +261,7 @@ trait AdminAuthTrait
         if ($return) {
             return $model->toArray();
         } else {
-            $result ? $this->success() : $this->error(Dictionary::ADMIN_AUTHTRAIT_14,Code::ERROR_OTHER);
+            $result ? $this->success() : $this->error("删除失败", Code::ERROR_OTHER);
         }
     }
 
@@ -272,8 +270,8 @@ trait AdminAuthTrait
         $post = $this->post;
         $pk = $this->Model->getPk();
         foreach ([$pk, 'column'] as $col) {
-            if ( ! isset($post[$col]) || ! isset($post[$post['column']])) {
-                return $this->error(Dictionary::ADMIN_AUTHTRAIT_15, Code::ERROR_OTHER);
+            if (!isset($post[$col]) || !isset($post[$post['column']])) {
+                return $this->error("缺少id或column", Code::ERROR_OTHER);
             }
         }
 
@@ -290,7 +288,7 @@ trait AdminAuthTrait
         $upd = $model->update([$column => $post[$column]], $where);
 //        $rowCount = $model->lastQueryResult()->getAffectedRows();
         if ($upd === false) {
-            throw new HttpParamException(lang(Dictionary::ADMIN_AUTHTRAIT_18));
+            throw new HttpParamException("修改失败");
         }
         return $return ? $model->toArray() : $this->success();
     }
@@ -385,7 +383,7 @@ trait AdminAuthTrait
 
         // 客户端response响应头获取不到Content-Disposition，用参数传文件名
         $fileName = $this->get[config('fetchSetting.exprotFilename')] ?? '';
-        if ( ! empty($fileName)) {
+        if (!empty($fileName)) {
             $fileName = sprintf('export-%d-%s.xlsx', date(DateUtils::YmdHis), substr(uniqid(), -5));
         }
 

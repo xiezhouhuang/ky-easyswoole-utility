@@ -7,8 +7,6 @@ use EasySwoole\EasySwoole\ServerManager;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\Socket\AbstractInterface\ParserInterface;
 use EasySwoole\Spl\SplBean;
-use Kyzone\EsNotify\EsNotify;
-use Kyzone\EsNotify\Interfaces\ConfigInterface;
 
 class EventMainServerCreate extends SplBean
 {
@@ -40,18 +38,11 @@ class EventMainServerCreate extends SplBean
 
     protected $hotReloadWatchDirs = [EASYSWOOLE_ROOT . '/App'  , EASYSWOOLE_ROOT . '/vendor/kyzone'];
 
-    /**
-     * @var null ['key' => new EsNotify/Config([])]
-     */
-    protected $notifyConfig = null;
-
     protected $consumerJobs = null;
 
     protected function initialize(): void
     {
-        if (is_null($this->notifyConfig)) {
-            $this->notifyConfig = config('ES_NOTIFY');
-        }
+
     }
 
     public function run()
@@ -63,7 +54,6 @@ class EventMainServerCreate extends SplBean
         $this->registerCrontab();
         $this->registerConsumer();
         $this->watchHotReload();
-        $this->registerNotify();
     }
 
     protected function registerWebSocketServer()
@@ -227,18 +217,4 @@ class EventMainServerCreate extends SplBean
         }
     }
 
-    protected function registerNotify()
-    {
-        $config = $this->notifyConfig;
-        if ( ! is_array($config)) {
-            return;
-        }
-        foreach ($config as $name => $cfg) {
-            if ($cfg instanceof ConfigInterface) {
-                EsNotify::getInstance()->register($cfg, $name);
-            } else {
-                trace("EsNotify 注册失败: $name");
-            }
-        }
-    }
 }

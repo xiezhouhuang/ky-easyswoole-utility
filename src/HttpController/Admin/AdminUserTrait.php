@@ -2,9 +2,7 @@
 
 namespace Kyzone\EsUtility\HttpController\Admin;
 
-use Kyzone\EsUtility\Common\Classes\Tree;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
-use Kyzone\EsUtility\Common\Languages\Dictionary;
 
 /**
  * @property \App\Model\Admin\Admin $Model
@@ -22,119 +20,119 @@ trait AdminUserTrait
         return $this->_search($where);
     }
 
-	protected function __after_index($items, $total)
-	{
-		foreach ($items as &$value) {
-			unset($value['password']);
-			$value->relation;
-		}
-		return parent::__after_index($items, $total);
-	}
+    protected function __after_index($items, $total)
+    {
+        foreach ($items as &$value) {
+            unset($value['password']);
+            $value->relation;
+        }
+        return parent::__after_index($items, $total);
+    }
 
-	/**
-	 * @param false $return 是否返回数据，而不是输出
-	 * @return array
-	 */
-	public function _getUserInfo($return = false)
-	{
-		
-		$config['sysinfo'] = sysinfo();
+    /**
+     * @param false $return 是否返回数据，而不是输出
+     * @return array
+     */
+    public function _getUserInfo($return = false)
+    {
 
-		$avatar = $this->operinfo['avatar'] ?? '';
+        $config['sysinfo'] = sysinfo();
 
-		$super = $this->isSuper();
+        $avatar = $this->operinfo['avatar'] ?? '';
 
-		$result = [
-			'id' => $this->operinfo['id'],
-			'username' => $this->operinfo['username'],
-			'realname' => $this->operinfo['realname'],
-			'avatar' => $avatar,
-			'desc' => $this->operinfo['desc'] ?? '',
-			'roles' => [
-				[
-					'roleName' => $this->operinfo['role']['name'] ?? '',
-					'value' => $this->operinfo['role']['value'] ?? ''
-				]
-			]
-		];
+        $super = $this->isSuper();
 
-		$result['config'] = $config;
+        $result = [
+            'id' => $this->operinfo['id'],
+            'username' => $this->operinfo['username'],
+            'realname' => $this->operinfo['realname'],
+            'avatar' => $avatar,
+            'desc' => $this->operinfo['desc'] ?? '',
+            'roles' => [
+                [
+                    'roleName' => $this->operinfo['role']['name'] ?? '',
+                    'value' => $this->operinfo['role']['value'] ?? ''
+                ]
+            ]
+        ];
 
-		return $return ? $result : $this->success($result);
-	}
+        $result['config'] = $config;
 
-	/**
-	 * 用户权限码
-	 */
-	public function _getPermCode($return = false)
-	{
-		/** @var \App\Model\Admin\AdminMenu $model */
-		$model = model('admin_menu');
-		$code = $model->permCode($this->operinfo['rid']);
-		return $return ? $code : $this->success($code);
-	}
+        return $return ? $result : $this->success($result);
+    }
 
-	public function edit()
-	{
-		if (empty($this->post['password'])) {
-			unset($this->post['password']);
-		}
-		return $this->_edit();
-	}
+    /**
+     * 用户权限码
+     */
+    public function _getPermCode($return = false)
+    {
+        /** @var \App\Model\Admin\AdminMenu $model */
+        $model = model('admin_menu');
+        $code = $model->permCode($this->operinfo['rid']);
+        return $return ? $code : $this->success($code);
+    }
 
-	public function _modify($return = false)
-	{
-		$userInfo = $this->operinfo;
+    public function edit()
+    {
+        if (empty($this->post['password'])) {
+            unset($this->post['password']);
+        }
+        return $this->_edit();
+    }
 
-		if ($this->isHttpGet()) {
-			// role的关联数据也可以不用理会，ORM会处理
-			unset($userInfo['password'], $userInfo['role']);
-			// 默认首页treeSelect, 仅看有权限的菜单
-			/** @var \App\Model\Admin\AdminMenu $Menu */
-			$Menu = model('admin_enu');
+    public function _modify($return = false)
+    {
+        $userInfo = $this->operinfo;
 
-			$where = [];
-			$menus = $this->getUserMenus();
-			if (is_array($menus)) {
-				$where['id'] = [$menus, 'in'];
-			}
-			$menuList = $Menu->menuList($where);
-			$data = ['menuList' => $menuList, 'result' => $userInfo];
-			return $return ? $data : $this->success($data);
-		} elseif ($this->isHttpPost()) {
-			$id = $this->post['id'];
-			if (empty($id) || $userInfo['id'] != $id) {
-				// 仅允许管理员编辑自己的信息
-				throw new HttpParamException(lang(Dictionary::ADMIN_ADMINTRAIT_6));
-			}
+        if ($this->isHttpGet()) {
+            // role的关联数据也可以不用理会，ORM会处理
+            unset($userInfo['password'], $userInfo['role']);
+            // 默认首页treeSelect, 仅看有权限的菜单
+            /** @var \App\Model\Admin\AdminMenu $Menu */
+            $Menu = model('admin_enu');
 
-			if ($this->post['__password'] && ! password_verify($this->post['__password'], $userInfo['password'])) {
-				throw new HttpParamException(lang(Dictionary::ADMIN_ADMINTRAIT_7));
-			}
+            $where = [];
+            $menus = $this->getUserMenus();
+            if (is_array($menus)) {
+                $where['id'] = [$menus, 'in'];
+            }
+            $menuList = $Menu->menuList($where);
+            $data = ['menuList' => $menuList, 'result' => $userInfo];
+            return $return ? $data : $this->success($data);
+        } elseif ($this->isHttpPost()) {
+            $id = $this->post['id'];
+            if (empty($id) || $userInfo['id'] != $id) {
+                // 仅允许管理员编辑自己的信息
+                throw new HttpParamException("id错误");
+            }
 
-			if (empty($this->post['__password']) || empty($this->post['password'])) {
-				unset($this->post['password']);
-			}
+            if ($this->post['__password'] && !password_verify($this->post['__password'], $userInfo['password'])) {
+                throw new HttpParamException("旧密码不正确");
+            }
 
-			return $this->_edit($return);
-		}
-	}
+            if (empty($this->post['__password']) || empty($this->post['password'])) {
+                unset($this->post['password']);
+            }
 
-	public function _getToken($return = false)
-	{
-		// 此接口比较重要，只允许超级管理员调用
-		if ( ! $this->isSuper()) {
-			throw new HttpParamException(lang(Dictionary::PERMISSION_DENIED));
-		}
-		if ( ! isset($this->get['id'])) {
-			throw new HttpParamException(lang(Dictionary::ADMIN_ADMINTRAIT_8));
-		}
-		$id = $this->get['id'];
-		$isExtsis = $this->Model->where(['id' => $id, 'status' => 1])->count();
-		if ( ! $isExtsis) {
-			throw new HttpParamException(lang(Dictionary::ADMIN_ADMINTRAIT_9));
-		}
-		$token = get_login_token($id, 3600);
-		return $return ? $token : $this->success($token);
-	}
+            return $this->_edit($return);
+        }
+    }
+
+    public function _getToken($return = false)
+    {
+        // 此接口比较重要，只允许超级管理员调用
+        if (!$this->isSuper()) {
+            throw new HttpParamException("对不起，没有权限");
+        }
+        if (!isset($this->get['id'])) {
+            throw new HttpParamException("id为空");
+        }
+        $id = $this->get['id'];
+        $isExtsis = $this->Model->where(['id' => $id, 'status' => 1])->count();
+        if (!$isExtsis) {
+            throw new HttpParamException("id为空");
+        }
+        $token = get_login_token($id, 3600);
+        return $return ? $token : $this->success($token);
+    }
 }

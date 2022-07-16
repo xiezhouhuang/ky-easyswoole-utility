@@ -13,32 +13,6 @@ use EasySwoole\I18N\I18N;
 
 class LamUnit
 {
-    public static function setI18n(Request $request, $headerKey = 'accept-language')
-    {
-        if ($request->hasHeader($headerKey)) {
-            $langage = $request->getHeader($headerKey);
-            if (is_array($langage)) {
-                $langage = current($langage);
-            }
-            $languages = config('LANGUAGES') ?: [];
-            foreach ($languages as $lang => $value) {
-                // 回调
-                if (is_callable($value['match'])) {
-                    $match = $value['match']($langage);
-                    if ($match === true) {
-                        I18N::getInstance()->setLanguage($lang);
-                        break;
-                    }
-                }
-                // 正则
-                elseif(is_string($value['match']) && preg_match($value['match'], $langage))
-                {
-                    I18N::getInstance()->setLanguage($lang);
-                    break;
-                }
-            }
-        }
-    }
     /**
      * @param Request $request
      * @param array $array 要合并的数据

@@ -7,7 +7,6 @@ namespace Kyzone\EsUtility\HttpController\Admin;
 use Kyzone\EsUtility\Common\Classes\Tree;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
 use Kyzone\EsUtility\Common\Http\Code;
-use Kyzone\EsUtility\Common\Languages\Dictionary;
 
 /**
  * Class Menu
@@ -39,7 +38,7 @@ trait AdminMenuTrait
 		if ( ! empty($name)) {
 			$model = $this->Model->_clone();
 			if ($model->where('name', $name)->count()) {
-				return $this->error(Dictionary::ADMIN_MENUTRAIT_1,Code::ERROR_OTHER);
+				return $this->error("name重复",Code::ERROR_OTHER);
 			}
 		}
 		return parent::_add($return);
@@ -52,7 +51,7 @@ trait AdminMenuTrait
 	{
 		$userMenus = $this->getUserMenus();
 		if ( ! is_null($userMenus) && empty($userMenus)) {
-			throw new HttpParamException(lang(Dictionary::PERMISSION_DENIED));
+			throw new HttpParamException("对不起，没有权限");
 		}
 		$menu = $this->Model->getRouter($userMenus);
 		return $return ? $menu : $this->success($menu);

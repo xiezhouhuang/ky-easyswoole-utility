@@ -386,14 +386,6 @@ if (!function_exists('ip')) {
 }
 
 
-if (!function_exists('lang')) {
-    function lang($const = '')
-    {
-        return I18N::getInstance()->translate($const);
-    }
-}
-
-
 if (!function_exists('array_to_std')) {
     function array_to_std(array $array = [])
     {
