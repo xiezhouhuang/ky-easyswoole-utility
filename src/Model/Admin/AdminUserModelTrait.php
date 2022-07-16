@@ -17,7 +17,6 @@ trait AdminUserModelTrait
 	protected function setBaseTraitProtected()
 	{
 		$this->autoTimeStamp = true;
-		$this->tableName = 'admin_user';
 		$this->sort = ['sort' => 'asc', 'id' => 'asc'];
 	}
 
@@ -35,6 +34,6 @@ trait AdminUserModelTrait
 	 */
 	public function relation()
 	{
-		return $this->hasOne(find_model('Admin\AdminRoleModel'), null, 'rid', 'id');
+		return $this->hasOne(model('admin_role'), null, 'rid', 'id');
 	}
 }

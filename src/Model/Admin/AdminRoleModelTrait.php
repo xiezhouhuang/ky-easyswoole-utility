@@ -8,7 +8,6 @@ trait AdminRoleModelTrait
 {
 	protected function setBaseTraitProtected()
 	{
-		$this->tableName = 'admin_role';
 		$this->autoTimeStamp = true;
 		$this->sort = ['sort' => 'asc', 'id' => 'asc'];
 	}

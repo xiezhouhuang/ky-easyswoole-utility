@@ -46,7 +46,7 @@ trait AdminAuthTrait
         return $this->checkAuthorization();
     }
 
-    protected function setAuthTraitProptected()
+    protected function setAuthTraitProtected()
     {
     }
 
@@ -68,7 +68,7 @@ trait AdminAuthTrait
 
         // uid验证
         /** @var AbstractModel $Admin */
-        $Admin = model_admin('Admin');
+        $Admin = model('AdminUserModel');
         // 当前用户信息
         $data = $Admin->where('id', $id)->get();
         if (empty($data)) {
@@ -119,9 +119,7 @@ trait AdminAuthTrait
             $this->error(Code::CODE_FORBIDDEN);
             return false;
         }
-
-        /** @var \App\Model\Admin\Menu $Menu */
-        $Menu = model_admin('Menu');
+        $Menu = model('admin_menu');
         $priv = $Menu->where('id', $userMenu, 'IN')->where('permission', '', '<>')->where('status', 1)->column('permission');
         if (empty($priv)) {
             return true;

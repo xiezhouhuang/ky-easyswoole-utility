@@ -12,7 +12,6 @@ trait AdminMenuModelTrait
 {
 	protected function setBaseTraitProtected()
 	{
-		$this->tableName = 'admin_menu';
 		$this->sort = ['sort' => 'asc', 'id' => 'desc'];
 	}
 
