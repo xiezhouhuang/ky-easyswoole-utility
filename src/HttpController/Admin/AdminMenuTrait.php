@@ -14,7 +14,7 @@ use Kyzone\EsUtility\Common\Languages\Dictionary;
  * @property \App\Model\Admin\Menu $Model
  * @package App\HttpController\Admin
  */
-trait MenuTrait
+trait AdminMenuTrait
 {
 	public function index()
 	{
