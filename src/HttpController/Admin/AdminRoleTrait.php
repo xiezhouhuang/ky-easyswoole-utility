@@ -4,7 +4,7 @@ namespace Kyzone\EsUtility\HttpController\Admin;
 
 use EasySwoole\ORM\AbstractModel;
 
-trait RoleTrait
+trait AdminRoleTrait
 {
     protected function __search()
     {
