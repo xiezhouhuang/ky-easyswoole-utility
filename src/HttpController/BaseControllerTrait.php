@@ -117,13 +117,6 @@ trait BaseControllerTrait
 	protected function writeJson($statusCode = 200, $result = null, $msg = null)
 	{
 		if ( ! $this->response()->isEndResponse()) {
-
-			if (is_null($msg)) {
-				$msg = Code::getReasonPhrase($statusCode);
-			} elseif ($msg && in_array($msg, $this->langsConstants)) {
-				$msg = lang($msg);
-			}
-
 			$data = [
 				'code' => $statusCode,
 				'data' => $result,
