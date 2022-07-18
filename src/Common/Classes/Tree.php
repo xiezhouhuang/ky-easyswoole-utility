@@ -36,7 +36,7 @@ class Tree
 
 	public function originData($where = [])
 	{
-		$Menu = model('admin_mneu');
+		$Menu = model('admin_menu');
 		if ($where) {
 			$Menu->where($where);
 		}

@@ -3,9 +3,7 @@
 namespace Kyzone\EsUtility\HttpController\Admin;
 
 use EasySwoole\Component\Timer;
-use EasySwoole\Http\Exception\FileException;
 use EasySwoole\ORM\AbstractModel;
-use EasySwoole\ORM\Db\MysqliClient;
 use EasySwoole\Policy\Policy;
 use EasySwoole\Policy\PolicyNode;
 use EasySwoole\Utility\MimeType;

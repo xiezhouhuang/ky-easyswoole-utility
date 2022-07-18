@@ -6,7 +6,7 @@ namespace Kyzone\EsUtility\Model\Admin;
 
 trait CrontabTrait
 {
-	protected function setBaseTraitProptected()
+	protected function setBaseTraitProtected()
 	{
 		$this->autoTimeStamp = true;
 	}

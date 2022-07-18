@@ -10,7 +10,7 @@ use Kyzone\EsUtility\Common\Http\Code;
 
 /**
  * Class Menu
- * @property \App\Model\Admin\Menu $Model
+ * @property \App\Model\Admin\AdminMneu $Model
  * @package App\HttpController\Admin
  */
 trait AdminMenuTrait
