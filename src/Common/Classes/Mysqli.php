@@ -14,7 +14,6 @@ class Mysqli extends MysqliClient
     protected $_config = [];
 
     /**
-     * 存储数据表字段列表 ['hourly' => ['gameid', 'login', 'reg', ...]]
      * @var array
      */
     protected $tableStruct = [];
