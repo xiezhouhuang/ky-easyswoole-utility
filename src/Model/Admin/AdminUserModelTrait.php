@@ -34,6 +34,6 @@ trait AdminUserModelTrait
 	 */
 	public function relation()
 	{
-		return $this->hasOne(model('admin_role'), null, 'rid', 'id');
+		return $this->hasOne(find_model('admin_role'), null, 'rid', 'id');
 	}
 }

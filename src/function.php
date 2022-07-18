@@ -80,8 +80,7 @@ if (!function_exists('model')) {
         $className = find_model($space . $name);
 
         /** @var AbstractModel $model */
-        $model = new $className($data, $tableName);
-
+        $model = new $className($data);
         $connectName = $model->getConnectionName();
         // 注入连接(连接池连接)
         if (is_bool($inject) && $inject) {
