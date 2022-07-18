@@ -5,7 +5,7 @@ namespace Kyzone\EsUtility\HttpController\Admin;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
 
 /**
- * @property \App\Model\Admin\Admin $Model
+ * @property \App\Model\AdminUser $Model
  */
 trait AdminUserTrait
 {
