@@ -9,8 +9,7 @@ use EasySwoole\ORM\AbstractModel;
  */
 trait ApiBaseTrait
 {
-	/** @var AbstractModel $Model */
-	protected $Model;
+	protected AbstractModel $Model;
 
 	/**
 	 * 实例化模型类
@@ -19,7 +18,7 @@ trait ApiBaseTrait
 	 *   4.不为空字符串，实例化指定模型
 	 * @var string
 	 */
-	protected $modelName = '';
+	protected ?string $modelName = null;
 
     protected function onRequest(?string $action): ?bool
 	{
