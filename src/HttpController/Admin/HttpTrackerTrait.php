@@ -25,7 +25,7 @@ trait HttpTrackerTrait
 			$tomorrow = strtotime('tomorrow');
 			$begintime = $tomorrow - (14 * 86400);
 			$endtime = $tomorrow - 1;
-			$this->Model->where('instime', [$begintime, $endtime], 'BETWEEN');
+			$this->Model->where('create_time', [$begintime, $endtime], 'BETWEEN');
 		} else {
 			$this->Model->where($this->get['where']);
 		}

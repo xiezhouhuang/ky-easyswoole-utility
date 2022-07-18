@@ -8,7 +8,7 @@ trait LogLoginTrait
 	{
 		$filter = $this->filter();
 
-		$where = ['instime' => [[$filter['begintime'], $filter['endtime']], 'between']];
+		$where = ['create_time' => [[$filter['begintime'], $filter['endtime']], 'between']];
         empty($this->get['uid']) or $where['concat(uid," ",name)'] = ["%{$this->get['uid']}%", 'like'];
 
         return $this->_search($where);

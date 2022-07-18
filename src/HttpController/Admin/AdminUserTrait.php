@@ -87,17 +87,8 @@ trait AdminUserTrait
         if ($this->isHttpGet()) {
             // role的关联数据也可以不用理会，ORM会处理
             unset($userInfo['password'], $userInfo['role']);
-            // 默认首页treeSelect, 仅看有权限的菜单
-            /** @var \App\Model\Admin\AdminMenu $Menu */
-            $Menu = model('admin_menu');
 
-            $where = [];
-            $menus = $this->getUserMenus();
-            if (is_array($menus)) {
-                $where['id'] = [$menus, 'in'];
-            }
-            $menuList = $Menu->menuList($where);
-            $data = ['menuList' => $menuList, 'result' => $userInfo];
+            $data = ['result' => $userInfo];
             return $return ? $data : $this->success($data);
         } elseif ($this->isHttpPost()) {
             $id = $this->post['id'];
