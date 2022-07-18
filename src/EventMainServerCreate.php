@@ -198,10 +198,10 @@ class EventMainServerCreate extends SplBean
                 echo Utility::displayItem("[message]", $throwable->getMessage()) . PHP_EOL;
                 echo Utility::displayItem("[file]", $throwable->getFile() . ', 第 ' . $throwable->getLine() . ' 行') . PHP_EOL;
 
-                echo Color::warning('trace:') . PHP_EOL;
+//                echo Color::warning('trace:') . PHP_EOL;
                 if ($trace = $throwable->getTrace()) {
                     // 简单打印就行
-                    var_dump($trace);
+//                    var_dump($trace);
 //                    foreach ($trace as $key => $item)
 //                    {
 //                        echo Utility::displayItem("$key-----------------------", $item) . PHP_EOL;

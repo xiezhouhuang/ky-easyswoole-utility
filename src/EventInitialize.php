@@ -37,7 +37,7 @@ class EventInitialize extends SplBean
     protected $mysqlOnQueryOpen = true;
     protected $mysqlOnQueryFunc = [
         '_before_func' => null, // 前置
-        '_save_log' => true, // 保存日志
+        '_save_log' => false, // 保存日志
         '_save_sql' => null, // 自定义保存
         '_after_func' => null, // 后置
     ];

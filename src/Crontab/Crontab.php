@@ -37,20 +37,20 @@ class Crontab extends AbstractCronTask
     {
         $cron = $this->getTaskList();
 
-        if (empty($cron) || ! is_array($cron)) {
+        if (empty($cron) || !is_array($cron)) {
             return;
         }
 
         $task = TaskManager::getInstance();
         foreach ($cron as $value) {
-            if ( ! CronExpression::isValidExpression($value['rule'])) {
+            if (!CronExpression::isValidExpression($value['rule'])) {
                 $msg = "id={$value['id']} 运行规则设置错误 {$value['rule']}";
-                trace($msg, 'error');
-                notice_txt($msg);
+                trace($msg, 'error', 'crontab');
+                notice_txt("运行规则错误", $msg);
                 continue;
             }
 
-            if ( ! (CronExpression::factory($value['rule'])->isDue())) {
+            if (!(CronExpression::factory($value['rule'])->isDue())) {
                 // 时间未到
                 continue;
             }
@@ -59,10 +59,10 @@ class Crontab extends AbstractCronTask
             if (is_string($args)) {
                 $args = json_decode($args, true);
             }
-            if ( ! is_array($args)) {
+            if (!is_array($args)) {
                 $msg = "定时任务参数解析失败: id={$value['id']},name={$value['name']},args=" . var_export($value['args'], true);
-                trace($msg, 'error');
-                notice_txt($msg);
+                trace($msg, 'error', 'crontab');
+                notice_txt("定时任务参数解析失败", $msg);
                 continue;
             }
 
@@ -70,7 +70,7 @@ class Crontab extends AbstractCronTask
             $class = new $className([$value['eclass'], $value['method']], $args);
             // 投递给异步任务
             $finish = $task->async($class, function ($reply, $taskId, $workerIndex) use ($value) {
-                trace("[CRONTAB] id={$value['id']} finish! {$value['name']}, reply={$reply}, workerIndex={$workerIndex}, taskid={$taskId}");
+                trace("[CRONTAB] id={$value['id']} finish! {$value['name']}, reply={$reply}, workerIndex={$workerIndex}, taskid={$taskId}", 'info', 'crontab');
             });
             // 只运行一次的任务
             if ($finish > 0 && $value['status'] == 2) {
@@ -78,7 +78,7 @@ class Crontab extends AbstractCronTask
             }
 
             if ($finish <= 0) {
-                trace("投递失败: 返回值={$finish}, id={$value['id']}, name={$value['name']}", 'error');
+                trace("投递失败: 返回值={$finish}, id={$value['id']}, name={$value['name']}", 'error', 'crontab');
             }
         }
     }
@@ -108,8 +108,7 @@ class Crontab extends AbstractCronTask
         if (is_callable($where)) {
             $where($Builder);
         } elseif (is_array($where)) {
-            foreach ($where as $whereField => $whereValue)
-            {
+            foreach ($where as $whereField => $whereValue) {
                 $Builder->where($whereField, ...$whereValue);
             }
         }
@@ -137,7 +136,7 @@ class Crontab extends AbstractCronTask
             File::createFile($file, json_encode($cron, JSON_UNESCAPED_UNICODE));
         } catch (\Exception | \Throwable $e) {
             // 失败降级从文件读取
-            if ( ! file_exists($file) || ! ($str = file_get_contents($file))) {
+            if (!file_exists($file) || !($str = file_get_contents($file))) {
                 // 连文件都没有，说明从未正常运行过
                 throw $e;
             }
@@ -158,7 +157,7 @@ class Crontab extends AbstractCronTask
             $className = '\\Kyzone\\EsUtility\\Task\\' . ucfirst($className);
         }
 
-        if ( ! class_exists($className) || ( ! $className instanceof TaskInterface)) {
+        if (!class_exists($className) || (!$className instanceof TaskInterface)) {
 //                trace("{$className} 不存在", 'error');
 //                continue;
             // 2022-04-06 为兼容旧版本
