@@ -9,7 +9,7 @@ use EasySwoole\ORM\AbstractModel;
  */
 trait ApiBaseTrait
 {
-	protected AbstractModel $Model;
+	protected ?AbstractModel $Model = null;
 
 	/**
 	 * 实例化模型类
