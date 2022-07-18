@@ -89,7 +89,7 @@ trait AdminUserTrait
             unset($userInfo['password'], $userInfo['role']);
             // 默认首页treeSelect, 仅看有权限的菜单
             /** @var \App\Model\Admin\AdminMenu $Menu */
-            $Menu = model('admin_enu');
+            $Menu = model('admin_menu');
 
             $where = [];
             $menus = $this->getUserMenus();
