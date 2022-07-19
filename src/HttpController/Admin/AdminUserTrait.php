@@ -27,14 +27,12 @@ trait AdminUserTrait
 
     protected function __after_index($items, $total)
     {
-        /** @var \App\Model\AdminRole $Role */
-        $Role = model('admin_role');
-        $roleList = $Role->getRoleListAll();
+
         foreach ($items as &$value) {
             unset($value['password']);
             $value->relation;
         }
-        return parent::__after_index(['items' => $items, 'roleList' => $roleList], $total);
+        return parent::__after_index($items, $total);
     }
 
     public function getUserInfo()
