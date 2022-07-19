@@ -10,7 +10,7 @@ use Kyzone\EsUtility\Library\Oss\OssDriver;
 trait UploadTrait
 {
 
-    public function _index()
+    public function index()
     {
         $request = $this->request();
         /** @var \EasySwoole\Http\Message\UploadFile $file */
