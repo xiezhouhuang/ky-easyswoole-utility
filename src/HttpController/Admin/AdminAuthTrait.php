@@ -21,10 +21,24 @@ trait AdminAuthTrait
 {
     protected $operinfo = [];
     // 别名认证
-    protected array $_authAlias = ['change' => 'edit', 'export' => 'index'];
+    protected array $_authAlias = [
+        'change' => 'edit',
+        'export' => 'index',
+        'repeat' => 'index',
+        'count' => 'index',
+        'run' => 'index'
+    ];
 
     // 无需认证
-    protected array $_authOmit = ['upload', 'options'];
+    protected array $_authOmit = [
+        'upload',
+        'options',
+        'getUserInfo',
+        'getPermCode',
+        'getMenuList',
+        'multiple',
+        'treeList',
+    ];
 
     protected $isExport = false;
 

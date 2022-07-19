@@ -15,7 +15,6 @@ use Kyzone\EsUtility\Common\Http\Code;
  */
 trait AdminMenuTrait
 {
-    protected array $_authOmit = ['getMenuList', 'treeList'];
 
     public function index()
     {

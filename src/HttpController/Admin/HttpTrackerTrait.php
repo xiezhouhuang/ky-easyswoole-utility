@@ -12,8 +12,6 @@ use Kyzone\EsUtility\Common\Http\Code;
  */
 trait HttpTrackerTrait
 {
-    protected array $_authAlias = ['repeat' => 'index', 'count' => 'index', 'run' => 'index'];
-
     protected function instanceModel()
     {
         $this->Model = model($this->getStaticClassName());

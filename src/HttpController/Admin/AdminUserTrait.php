@@ -11,8 +11,6 @@ use Kyzone\EsUtility\Common\Exception\HttpParamException;
 trait AdminUserTrait
 {
 
-    protected array $_authOmit = ['getUserInfo', 'getPermCode'];
-
     protected function __search()
     {
         $where = [];
