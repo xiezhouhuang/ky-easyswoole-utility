@@ -64,12 +64,31 @@ trait BaseModelTrait
 		return is_numeric($ip) ? $ip : ip2long($ip);
 	}
 
-	protected function setInstimeAttr($instime, $all)
-	{
-		return is_numeric($instime) ? $instime : strtotime($instime);
-	}
+    protected function getExtensionAttr($extension = '', $alldata = [])
+    {
+        return is_array($extension) ? $extension : json_decode($extension, true);
+    }
 
-	public function scopeIndex()
+    /**
+     * 数据写入前对extension字段的值进行处理
+     * @access protected
+     * @param array $extension 原数据
+     * @param bool $encode 是否强制编码
+     * @return string 处理后的值
+     */
+    protected function setExtensionAttr($extension = [], $alldata = [])
+    {
+        if (is_string($extension)) {
+            $extension = json_decode($extension, true);
+            if ( ! $extension) {
+                return json_encode(new \stdClass());
+            }
+        }
+        return json_encode($extension);
+    }
+
+
+    public function scopeIndex()
 	{
 		return $this;
 	}

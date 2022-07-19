@@ -7,7 +7,7 @@ use Kyzone\EsUtility\Common\Classes\CtxRequest;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
 
 /**
- * @property \App\Model\Admin\AdminUser $Model
+ * @property \App\Model\AdminUser $Model
  */
 trait PublicTrait
 {
