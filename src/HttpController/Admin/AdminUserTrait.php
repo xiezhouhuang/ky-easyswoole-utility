@@ -2,6 +2,7 @@
 
 namespace Kyzone\EsUtility\HttpController\Admin;
 
+use Kyzone\EsUtility\Common\Classes\Tree;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
 
 /**
@@ -9,58 +10,77 @@ use Kyzone\EsUtility\Common\Exception\HttpParamException;
  */
 trait AdminUserTrait
 {
+
+    protected array $_authOmit = ['getUserInfo', 'getPermCode'];
+
     protected function __search()
     {
         $where = [];
-
-        empty($this->get['rid']) or $where['rid'] = $this->get['rid'];
-        isset($this->get['status']) && is_numeric($this->get['status']) && $where['status'] = $this->get['status'];
-        empty($this->get['name']) or $where['concat(username," ",realname)'] = ["%{$this->get['name']}%", 'like'];
-
-        return $this->_search($where);
+        if (!empty($this->get['rid'])) {
+            $where['rid'] = $this->get['rid'];
+        }
+        foreach (['username', 'realname'] as $val) {
+            if (!empty($this->get[$val])) {
+                $where[$val] = ["%{$this->get[$val]}%", 'like'];
+            }
+        }
+        return $where;
     }
 
     protected function __after_index($items, $total)
     {
+        /** @var \App\Model\AdminRole $Role */
+        $Role = model('admin_role');
+        $roleList = $Role->getRoleListAll();
         foreach ($items as &$value) {
             unset($value['password']);
             $value->relation;
         }
-        return parent::__after_index($items, $total);
+        return parent::__after_index(['items' => $items, 'roleList' => $roleList], $total);
     }
 
-    /**
-     * @param false $return 是否返回数据，而不是输出
-     * @return array
-     */
-    public function _getUserInfo($return = false)
+    public function getUserInfo()
     {
-
-        $config['sysinfo'] = sysinfo();
-
         $avatar = $this->operinfo['avatar'] ?? '';
-
-        $super = $this->isSuper();
-
+        // 客户端进入页,应存id
+        if (!empty($this->operinfo['extension']['homePath']))
+        {
+            $Tree = new Tree();
+            $homePage = $Tree->originData(['type' => [[0, 1], 'in']])->getHomePath($this->operinfo['extension']['homePath']);
+        }
         $result = [
             'id' => $this->operinfo['id'],
             'username' => $this->operinfo['username'],
             'realname' => $this->operinfo['realname'],
             'avatar' => $avatar,
             'desc' => $this->operinfo['desc'] ?? '',
+            'homePath' => $homePage ?? '',
             'roles' => [
                 [
                     'roleName' => $this->operinfo['role']['name'] ?? '',
                     'value' => $this->operinfo['role']['value'] ?? ''
                 ]
-            ]
+            ],
+            "sysinfo" => sysinfo()
         ];
 
-        $result['config'] = $config;
-
-        return $return ? $result : $this->success($result);
+        $this->success($result);
     }
 
+    public function edit()
+    {
+        if ($this->isHttpGet()) {
+            $data = $this->_edit(true);
+            unset($data['password'], $data['create_time']);
+            $this->success($data);
+        } else {
+            // 留空，不修改密码
+            if (empty($this->post['password'])) {
+                unset($this->post['password']);
+            }
+            $this->_edit();
+        }
+    }
     /**
      * 用户权限码
      */
@@ -70,14 +90,6 @@ trait AdminUserTrait
         $model = model('admin_menu');
         $code = $model->permCode($this->operinfo['rid']);
         return $return ? $code : $this->success($code);
-    }
-
-    public function edit()
-    {
-        if (empty($this->post['password'])) {
-            unset($this->post['password']);
-        }
-        return $this->_edit();
     }
 
     public function _modify($return = false)

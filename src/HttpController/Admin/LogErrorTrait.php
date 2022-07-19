@@ -4,6 +4,7 @@ namespace Kyzone\EsUtility\HttpController\Admin;
 
 trait LogErrorTrait
 {
+    protected array $_authOmit = ['multiple'];
 	protected function __search()
 	{
         $filter = $this->filter();
