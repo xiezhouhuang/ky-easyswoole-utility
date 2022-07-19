@@ -84,7 +84,7 @@ trait BaseControllerTrait
         $this->error($message, $throwable->getCode() ?: Code::CODE_INTERNAL_SERVER_ERROR);
     }
 
-    protected function success($result = null, $msg = null)
+    protected function success($result = null, $msg = "请求成功")
     {
         return $this->writeJson(Code::CODE_OK, $result, $msg);
     }
