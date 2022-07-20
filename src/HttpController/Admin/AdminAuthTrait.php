@@ -20,6 +20,8 @@ use Kyzone\EsUtility\Common\Http\Code;
 trait AdminAuthTrait
 {
     protected $operinfo = [];
+    // 唯一字段是否已存在
+    protected array $_uniqueField = ['username'];
     // 别名认证
     protected array $_authAlias = [
         'change' => 'edit',
@@ -225,9 +227,33 @@ trait AdminAuthTrait
         return $model;
     }
 
+    public function __addEditVerification()
+    {
+
+    }
+
+    public function __saveBeforeVerification()
+    {
+        $request = array_merge($this->get, $this->post);
+        $pk = $this->Model->getPk();
+        foreach ($this->_uniqueField as $filed) {
+            if (isset($request[$filed])) {
+                $model = $this->Model->_clone()->where($filed,$request[$filed]);
+                if (intval($request[$pk]) > 0) {
+                    $model->where($pk ,$request[$pk],'!=');
+                }
+                $count = $model->count();
+                if ($count > 0) {
+                    new HttpParamException($filed . "字段不能重复");
+                }
+            }
+        }
+    }
+
     public function _add($return = false)
     {
         if ($this->isHttpPost()) {
+            $this->__saveBeforeVerification();
             $result = $this->Model->data($this->post)->save();
             if ($return) {
                 return $result;
@@ -244,7 +270,7 @@ trait AdminAuthTrait
         $request = array_merge($this->get, $this->post);
 
         if ($this->isHttpPost()) {
-
+            $this->__saveBeforeVerification();
             $where = null;
             // 单独处理id为0值的情况，因为update传where后，data不会取差集，会每次update所有字段, 而不传$where时会走进preSetWhereFromExistModel用empty判断主键，0值会报错
             if (intval($request[$pk]) === 0) {
