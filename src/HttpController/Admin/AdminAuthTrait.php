@@ -21,7 +21,7 @@ trait AdminAuthTrait
 {
     protected $operinfo = [];
     // 唯一字段是否已存在
-    protected array $_uniqueField = ['username'];
+    protected array $_uniqueField = ['username' => '账号'];
     // 别名认证
     protected array $_authAlias = [
         'change' => 'edit',
@@ -227,24 +227,19 @@ trait AdminAuthTrait
         return $model;
     }
 
-    public function __addEditVerification()
-    {
-
-    }
-
     public function __saveBeforeVerification()
     {
         $request = array_merge($this->get, $this->post);
         $pk = $this->Model->getPk();
-        foreach ($this->_uniqueField as $filed) {
+        foreach ($this->_uniqueField as $filed => $fieldName) {
             if (isset($request[$filed])) {
-                $model = $this->Model->_clone()->where($filed,$request[$filed]);
+                $model = $this->Model->_clone()->where($filed, $request[$filed]);
                 if (intval($request[$pk]) > 0) {
-                    $model->where($pk ,$request[$pk],'!=');
+                    $model->where($pk, $request[$pk], '!=');
                 }
                 $count = $model->count();
                 if ($count > 0) {
-                    new HttpParamException($filed . "字段不能重复");
+                    throw new HttpParamException($fieldName . "字段不能重复");
                 }
             }
         }
