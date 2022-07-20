@@ -239,7 +239,7 @@ trait AdminAuthTrait
                 }
                 $count = $model->count();
                 if ($count > 0) {
-                    throw new HttpParamException($fieldName . "字段不能重复");
+                    throw new HttpParamException($fieldName . "不能重复");
                 }
             }
         }
