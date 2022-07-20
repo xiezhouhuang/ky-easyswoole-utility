@@ -21,7 +21,7 @@ trait AdminAuthTrait
 {
     protected $operinfo = [];
     // 唯一字段是否已存在
-    protected array $_uniqueField = ['username' => '账号'];
+    protected array $_uniqueField = [];
     // 别名认证
     protected array $_authAlias = [
         'change' => 'edit',
