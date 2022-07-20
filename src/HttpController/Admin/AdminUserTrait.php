@@ -10,7 +10,7 @@ use Kyzone\EsUtility\Common\Exception\HttpParamException;
  */
 trait AdminUserTrait
 {
-
+    protected array $_uniqueField = ['username' => '账号'];
     protected function __search()
     {
         $where = [];
