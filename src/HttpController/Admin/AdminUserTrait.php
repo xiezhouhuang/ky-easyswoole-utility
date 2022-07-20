@@ -10,7 +10,7 @@ use Kyzone\EsUtility\Common\Exception\HttpParamException;
  */
 trait AdminUserTrait
 {
-    protected array $_uniqueField = ['username' => '账号'];
+
     protected function __search()
     {
         $where = [];
@@ -134,4 +134,5 @@ trait AdminUserTrait
         $token = get_login_token($id, 3600);
         return $return ? $token : $this->success($token);
     }
+
 }
