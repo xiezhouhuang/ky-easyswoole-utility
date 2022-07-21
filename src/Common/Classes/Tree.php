@@ -19,7 +19,20 @@ class Tree
 	 */
 	protected $childName = 'children';
 
-	/**
+    /**
+     * id  字段名
+     * @var number
+     */
+    protected $id = 'id';
+
+
+    /**
+     * pid 字段名
+     * @var number
+     */
+    protected $pid = 'pid';
+
+    /**
 	 * 返回的tree限制在固定的id范围内, null 不限制
 	 * @var array|null
 	 */
@@ -58,7 +71,7 @@ class Tree
 	{
 		$arr = [];
 		foreach ($this->menu as $value) {
-			$arr[] = $value['pid'];
+			$arr[] = $value[$this->pid];
 		}
 		$min = min($arr);
 		return $this->buildMenuTree($min);
@@ -76,15 +89,15 @@ class Tree
 			if ($value instanceof \EasySwoole\ORM\AbstractModel) {
 				$value = $value->toArray();
 			}
-			if ($value['pid'] === $pid) {
+			if ($value[$this->pid] === $pid) {
 //                unset($this->menu[$key]);
 				// 继续找儿子
-				if ($children = $this->buildMenuTree($value['id'])) {
+				if ($children = $this->buildMenuTree($value[$this->id])) {
 					$value[$this->childName] = $children;
 				}
 
 				// 儿子在id列表爸爸不在，把爸爸也算上, 适用于 treeSelect 当子节点未选满时不会返回父节点的场景
-				if (is_null($this->ids) || (is_array($this->ids) && in_array($value['id'], $this->ids) || $children)) {
+				if (is_null($this->ids) || (is_array($this->ids) && in_array($value[$this->id], $this->ids) || $children)) {
 					$result[] = $value;
 				}
 			}
@@ -157,14 +170,32 @@ class Tree
 				$value = $value->toArray();
 			}
 
-			if ($value['id'] == $id) {
+			if ($value[$this->id] == $id) {
 				$result[] = trim($value['path'], '/');
-				if ( ! empty($value['pid'])) {
+				if ( ! empty($value[$this->pid])) {
 					// 继续找爸爸
-					$result[] = $this->buildPath($value['pid']);
+					$result[] = $this->buildPath($value[$this->pid]);
 				}
 			}
 		}
 		return count($result) > 1 ? $result : current($result);
 	}
+
+    /**
+     * @param number $id
+     */
+    public function setId(string $id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @param number $pid
+     */
+    public function setPid(string $pid)
+    {
+        $this->pid = $pid;
+        return $this;
+    }
 }
