@@ -119,6 +119,8 @@ class EventMainServerCreate extends SplBean
         }
         $server = ServerManager::getInstance()->getSwooleServer();
         $tcpPort = $server->addlistener(config('SUB_SERVER.LISTEN_ADDRESS'), config('SUB_SERVER.PORT'), SWOOLE_TCP);
+        $setting = config('SUB_SERVER.SETTING') ?? [];
+        $tcpPort->set($setting);
 
         $config = new \EasySwoole\Socket\Config();
         $config->setType(\EasySwoole\Socket\Config::TCP);
@@ -135,7 +137,7 @@ class EventMainServerCreate extends SplBean
             trace($throwable->getMessage(), 'error');
             $response->setStatus($response::STATUS_RESPONSE_AND_CLOSE);
         });
-        $tcpPort->set($register::onReceive, function (\Swoole\Server $server, int $fd, int $reactorId, string $data) use ($dispatch) {
+        $tcpPort->add($register::onReceive, function (\Swoole\Server $server, int $fd, int $reactorId, string $data) use ($dispatch) {
             $data = json_encode([
                 "controller" => 'Index',
                 "action" => 'onReceive',
