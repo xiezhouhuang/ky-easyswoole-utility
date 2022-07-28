@@ -138,12 +138,12 @@ class EventMainServerCreate extends SplBean
             $response->setStatus($response::STATUS_RESPONSE_AND_CLOSE);
         });
         $tcpPort->on($register::onReceive, function (\Swoole\Server $server, int $fd, int $reactorId, string $data) use ($dispatch) {
-            $data = json_encode([
+            $msgData = json_encode([
                 "controller" => 'Index',
                 "action" => 'onReceive',
-                'data' => $data
+                'message' => $data
             ]);
-            $dispatch->dispatch($server, $data, $fd, $reactorId);
+            $dispatch->dispatch($server, $msgData, $fd, $reactorId);
         });
         $tcpPort->on($register::onConnect, function (\Swoole\Server $server, int $fd, int $reactorId) use ($dispatch) {
             $data = json_encode([
