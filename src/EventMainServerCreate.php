@@ -137,7 +137,7 @@ class EventMainServerCreate extends SplBean
             trace($throwable->getMessage(), 'error');
             $response->setStatus($response::STATUS_RESPONSE_AND_CLOSE);
         });
-        $tcpPort->add($register::onReceive, function (\Swoole\Server $server, int $fd, int $reactorId, string $data) use ($dispatch) {
+        $tcpPort->on($register::onReceive, function (\Swoole\Server $server, int $fd, int $reactorId, string $data) use ($dispatch) {
             $data = json_encode([
                 "controller" => 'Index',
                 "action" => 'onReceive',
@@ -145,14 +145,14 @@ class EventMainServerCreate extends SplBean
             ]);
             $dispatch->dispatch($server, $data, $fd, $reactorId);
         });
-        $tcpPort->add($register::onConnect, function (\Swoole\Server $server, int $fd, int $reactorId) use ($dispatch) {
+        $tcpPort->on($register::onConnect, function (\Swoole\Server $server, int $fd, int $reactorId) use ($dispatch) {
             $data = json_encode([
                 "controller" => 'Index',
                 "action" => 'onConnect'
             ]);
             $dispatch->dispatch($server, $data, $fd, $reactorId);
         });
-        $tcpPort->add($register::onClose, function (\Swoole\Server $server, int $fd, int $reactorId) use ($dispatch) {
+        $tcpPort->on($register::onClose, function (\Swoole\Server $server, int $fd, int $reactorId) use ($dispatch) {
             $data = json_encode([
                 "controller" => 'Index',
                 "action" => 'onClose'
