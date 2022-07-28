@@ -119,10 +119,6 @@ class EventMainServerCreate extends SplBean
         }
         $server = ServerManager::getInstance()->getSwooleServer();
         $tcpPort = $server->addlistener(config('SUB_SERVER.LISTEN_ADDRESS'), config('SUB_SERVER.PORT'), SWOOLE_TCP);
-        $tcpPort->set(
-        // swoole 相关配置
-            config('SUB_SERVER.SETTING') ?? []
-        );
 
         $config = new \EasySwoole\Socket\Config();
         $config->setType(\EasySwoole\Socket\Config::TCP);
