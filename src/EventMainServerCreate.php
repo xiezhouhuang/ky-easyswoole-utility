@@ -1,4 +1,5 @@
 <?php
+
 namespace Kyzone\EsUtility;
 
 use EasySwoole\Command\Color;
@@ -7,6 +8,7 @@ use EasySwoole\EasySwoole\ServerManager;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\Socket\AbstractInterface\ParserInterface;
 use EasySwoole\Spl\SplBean;
+use EasySwoole\Socket\Bean\Response;
 
 class EventMainServerCreate extends SplBean
 {
@@ -29,6 +31,12 @@ class EventMainServerCreate extends SplBean
     protected $WebSocketParser = WebSocket\Parser::class;
 
     /**
+     * Tcp解释器
+     * @var null
+     */
+    protected $TcpSocketParser = Tcp\Parser::class;
+
+    /**
      *
      * @var null
      */
@@ -36,7 +44,7 @@ class EventMainServerCreate extends SplBean
     protected $crontabRunEnv = ['dev', 'test', 'produce'];
 
 
-    protected $hotReloadWatchDirs = [EASYSWOOLE_ROOT . '/App'  , EASYSWOOLE_ROOT . '/vendor/kyzone'];
+    protected $hotReloadWatchDirs = [EASYSWOOLE_ROOT . '/App', EASYSWOOLE_ROOT . '/vendor/kyzone'];
 
     protected $consumerJobs = null;
 
@@ -51,6 +59,10 @@ class EventMainServerCreate extends SplBean
         if (config('MAIN_SERVER.SERVER_TYPE') === EASYSWOOLE_WEB_SOCKET_SERVER) {
             $this->registerWebSocketServer();
         }
+        // 是否开启子服务TCP
+        if (config('SUB_SERVER.SERVER_TYPE') === EASYSWOOLE_SERVER) {
+            $this->registerTcpServer();
+        }
         $this->registerCrontab();
         $this->registerConsumer();
         $this->watchHotReload();
@@ -59,7 +71,7 @@ class EventMainServerCreate extends SplBean
     protected function registerWebSocketServer()
     {
         $register = $this->EventRegister;
-        if ( ! $register instanceof EventRegister) {
+        if (!$register instanceof EventRegister) {
             throw new \Exception('EventRegister Error');
         }
 
@@ -85,20 +97,71 @@ class EventMainServerCreate extends SplBean
             foreach ($events as $event => $item) {
                 $register->add($event, $item);
             }
-        }
-        else if (is_string($events) && class_exists($events)) {
+        } else if (is_string($events) && class_exists($events)) {
             $allowNames = (new \ReflectionClass(EventRegister::class))->getConstants();
             $Ref = new \ReflectionClass($events);
             $public = $Ref->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-            foreach ($public as $item)
-            {
+            foreach ($public as $item) {
                 $name = $item->name;
                 if ($item->isStatic() && isset($allowNames[$name])) {
                     $register->add($allowNames[$name], [$item->class, $name]);
                 }
             }
         }
+    }
+
+    protected function registerTcpServer()
+    {
+        $register = $this->EventRegister;
+        if (!$register instanceof EventRegister) {
+            throw new \Exception('EventRegister Error');
+        }
+        $server = ServerManager::getInstance()->getSwooleServer();
+        $tcpPort = $server->addlistener(config('SUB_SERVER.LISTEN_ADDRESS'), config('SUB_SERVER.PORT'), SWOOLE_TCP);
+        $tcpPort->set(
+        // swoole 相关配置
+            config('SUB_SERVER.SETTING') ?? []
+        );
+
+        $config = new \EasySwoole\Socket\Config();
+        $config->setType(\EasySwoole\Socket\Config::TCP);
+        if ($this->TcpSocketParser) {
+            $parserClassName = $this->TcpSocketParser;
+            $ParserClass = new $parserClassName();
+            if ($ParserClass instanceof ParserInterface) {
+                $config->setParser($ParserClass);
+            }
+        }
+
+        $dispatch = new \EasySwoole\Socket\Dispatcher($config);
+        $config->setOnExceptionHandler(function (\Swoole\Server $server, \Throwable $throwable, string $raw, \EasySwoole\Socket\Client\Tcp $client, Response $response) {
+            trace($throwable->getMessage(), 'error');
+            $response->setStatus($response::STATUS_RESPONSE_AND_CLOSE);
+        });
+        $tcpPort->set($register::onReceive, function (\Swoole\Server $server, int $fd, int $reactorId, string $data) use ($dispatch) {
+            $data = json_encode([
+                "controller" => 'Index',
+                "action" => 'onReceive',
+                'data' => $data
+            ]);
+            $dispatch->dispatch($server, $data, $fd, $reactorId);
+        });
+        $tcpPort->add($register::onConnect, function (\Swoole\Server $server, int $fd, int $reactorId) use ($dispatch) {
+            $data = json_encode([
+                "controller" => 'Index',
+                "action" => 'onConnect'
+            ]);
+            $dispatch->dispatch($server, $data, $fd, $reactorId);
+        });
+        $tcpPort->add($register::onClose, function (\Swoole\Server $server, int $fd, int $reactorId) use ($dispatch) {
+            $data = json_encode([
+                "controller" => 'Index',
+                "action" => 'onClose'
+            ]);
+            $dispatch->dispatch($server, $data, $fd, $reactorId);
+        });
+
     }
 
     /**
@@ -126,7 +189,7 @@ class EventMainServerCreate extends SplBean
     protected function registerConsumer()
     {
         $jobs = $this->consumerJobs;
-        if ( ! is_array($jobs)) {
+        if (!is_array($jobs)) {
             return;
         }
         $group = config('SERVER_NAME') . '.my';
@@ -135,7 +198,7 @@ class EventMainServerCreate extends SplBean
             $proName = $group . '.' . $value['name'];
 
             $class = $value['class'];
-            if (empty($class) || ! class_exists($class)) {
+            if (empty($class) || !class_exists($class)) {
                 continue;
             }
             $psnum = intval($value['psnum'] ?? 1);
@@ -162,7 +225,7 @@ class EventMainServerCreate extends SplBean
     {
         $watchConfig = $this->hotReloadWatchDirs;
         // 只允许在开发环境运行
-        if (is_env('dev') && is_array($watchConfig) && ! empty($watchConfig)) {
+        if (is_env('dev') && is_array($watchConfig) && !empty($watchConfig)) {
             $watcher = new \EasySwoole\FileWatcher\FileWatcher();
             // 设置监控规则和监控目录
             foreach ($watchConfig as $dir) {
