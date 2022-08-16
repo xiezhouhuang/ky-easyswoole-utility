@@ -337,6 +337,7 @@ trait AdminAuthTrait
         $page = $this->get[config('fetchSetting.pageField')] ?? 1;          // 当前页码
         $limit = $this->get[config('fetchSetting.sizeField')] ?? 20;    // 每页多少条数据
 
+        $this->__with();
         $where = $this->__search();
 
         // 处理排序
@@ -357,6 +358,17 @@ trait AdminAuthTrait
     protected function __after_index($items, $total)
     {
         return [config('fetchSetting.listField') => $items, config('fetchSetting.totalField') => $total];
+    }
+
+    protected function __with($column = 'relation')
+    {
+        $origin = $this->Model->getWith();
+        $exist = is_array($origin) && in_array($column, $origin);
+        if ( ! $exist && method_exists($this->Model, $column)) {
+            $with = is_array($origin) ? array_merge($origin, [$column]) : [$column];
+            $this->Model->with($with);
+        }
+        return $this;
     }
 
     protected function __order()
@@ -400,14 +412,14 @@ trait AdminAuthTrait
             }
         }
 
-        $where = $this->__search();
+        $where = $this->__with()->__search();
 
         // 处理排序
         $this->__order();
 
         // todo 希望优化为fetch模式
         $items = $this->Model->all($where);
-        $data = $this->__afterIndex($items, 0)[config('fetchSetting.listField')];
+        $data = $this->__after_index($items, 0)[config('fetchSetting.listField')];
 
         // 是否需要合并合计行，如需合并，data为索引数组，为空字段需要占位
 
@@ -474,7 +486,7 @@ trait AdminAuthTrait
             }
 
             $filter['begintime'] = strtotime($this->get['begintime']);
-            $filter['beginday'] = date(DateUtils::_ymd, $filter['begintime']);
+            $filter['beginday'] = date(DateUtils::YMD, $filter['begintime']);
         }
 
         if (isset($this->get['endtime'])) {
@@ -483,7 +495,7 @@ trait AdminAuthTrait
             }
 
             $filter['endtime'] = strtotime($this->get['endtime']);
-            $filter['endday'] = date(DateUtils::_ymd, $filter['endtime']);
+            $filter['endday'] = date(DateUtils::YMD, $filter['endtime']);
         }
         return $filter + $this->get;
     }

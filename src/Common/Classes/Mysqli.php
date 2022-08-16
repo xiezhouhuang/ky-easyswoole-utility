@@ -6,14 +6,15 @@ namespace Kyzone\EsUtility\Common\Classes;
 use EasySwoole\Mysqli\Client;
 use EasySwoole\Mysqli\Config;
 use EasySwoole\Mysqli\QueryBuilder;
+use EasySwoole\ORM\AbstractModel;
+use EasySwoole\ORM\Db\Cursor;
 use EasySwoole\ORM\Db\MysqliClient;
 use EasySwoole\ORM\Db\Result;
 
 class Mysqli extends MysqliClient
 {
-    protected $_config = [];
-
     /**
+     * 存储数据表字段列表 ['hourly' => ['gameid', 'login', 'reg', ...]]
      * @var array
      */
     protected $tableStruct = [];
@@ -24,14 +25,17 @@ class Mysqli extends MysqliClient
      */
     public function __construct(string $name = 'default', array $config = [])
     {
-        $this->_config = config('MYSQL.' . $name);
-        $this->_config = array_merge($this->_config, $config);
+        if ($name && is_array($cfg = config('MYSQL.' . $name))) {
+            $configArray = array_merge($cfg, $config);
+            $this->connectionName($name);
+        } else {
+            $configArray = $config;
+            $this->connectionName(md5(json_encode($configArray)));
+        }
 
-        $this->connectionName($name);
+        parent::__construct(new Config($configArray));
 
-        parent::__construct(new Config($this->_config));
-
-        if ( ! isset($this->_config['save_log']) || $this->_config['save_log'] !== false) {
+        if ( ! isset($configArray['save_log']) || $configArray['save_log'] !== false) {
             $this->onQuery(function ($res, Client $client, $start) {
                 trace($client->lastQueryBuilder()->getLastQuery(), 'info', 'sql');
             });
@@ -94,6 +98,32 @@ class Mysqli extends MysqliClient
     }
 
     /**
+     * @param QueryBuilder $Builder
+     * @param string $modelName AbstractModel子类，否则为数组
+     * @return \Generator
+     * @throws \Throwable
+     */
+    public function fetch(QueryBuilder $Builder, string $modelName = '')
+    {
+        $this->config->setFetchMode(true);
+
+        $this->connect();
+        /** @var Cursor $Cursor */
+        $Cursor = $this->query($Builder, false)->getResult();
+
+        if ($modelName && class_exists($modelName) && is_subclass_of($modelName, AbstractModel::class)) {
+            $Cursor->setModelName($modelName);
+            $Cursor->setReturnAsArray(false);
+        } else {
+            $Cursor->setReturnAsArray(true);
+        }
+
+        while ($ret = $Cursor->fetch()) {
+            yield $ret;
+        }
+    }
+
+    /**
      * 设置连接时区
      * @param $tzn 格式为: -5 或 -5:00 或 8 或 +8:00 ...
      * @throws \EasySwoole\Mysqli\Exception\Exception
@@ -114,5 +144,26 @@ class Mysqli extends MysqliClient
         $PhpTimeZone = date_default_timezone_get();
 
         return [$dbTimeZone, $PhpTimeZone];
+    }
+
+    public function startTransaction()
+    {
+        $Builder = new QueryBuilder();
+        $Builder->startTransaction();
+        $this->query($Builder);
+    }
+
+    public function commit()
+    {
+        $Builder = new QueryBuilder();
+        $Builder->commit();
+        $this->query($Builder);
+    }
+
+    public function rollback()
+    {
+        $Builder = new QueryBuilder();
+        $Builder->rollback();
+        $this->query($Builder);
     }
 }
