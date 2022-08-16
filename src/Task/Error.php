@@ -35,7 +35,7 @@ class Error implements TaskInterface
                 '- 触发方式： ' . $this->data['trigger'] ?? '',
             ]);
             //  通知
-            wechat_notice($title, $message);
+            wecom_markdown($message);
         }
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kyzone\EsUtility\Notify\DingTalk;
+namespace Kyzone\EsUtility\Notify\WeCom;
 
 use Kyzone\EsUtility\Notify\Interfaces\ConfigInterface;
 use Kyzone\EsUtility\Notify\Interfaces\NotifyInterface;
@@ -14,11 +14,6 @@ class Config extends SplBean implements ConfigInterface
      */
     protected $url = '';
 
-    /**
-     * 密钥
-     * @var string
-     */
-    protected $signKey = '';
 
     public function setUrl($url)
     {
@@ -28,16 +23,6 @@ class Config extends SplBean implements ConfigInterface
     public function getUrl()
     {
         return $this->url;
-    }
-
-    public function setSignKey($signKey)
-    {
-        $this->signKey = $signKey;
-    }
-
-    public function getSignKey()
-    {
-        return $this->signKey;
     }
 
     public function getNotifyClass(): NotifyInterface

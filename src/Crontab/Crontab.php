@@ -48,7 +48,7 @@ class Crontab extends AbstractCronTask
             "- name: {$row['name']}",
             "- 详 情：$message",
         ]);
-        dingtalk_markdown($title, $textArray);
+        wecom_markdown($textArray);
     }
 
     public function run(int $taskId, int $workerIndex)

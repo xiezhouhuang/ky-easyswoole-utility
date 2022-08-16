@@ -166,7 +166,7 @@ class ShardTable extends SplBean
             $title = '数据表分区不足！！';
             $msg = "检测到以下表分区不足{$day}天：" . implode('、', $warning);
             trace($title . $msg, 'info', 'worker');
-            wechat_notice($title, $msg);
+            wecom_text($title . $msg);
         }
     }
 
@@ -181,7 +181,7 @@ class ShardTable extends SplBean
     {
         if ($code > 0) {
             $title = '执行分区错误: ';
-            wechat_notice($title, $msg);
+            wecom_text($title . $msg);
         }
         trace($msg, $code ? 'error' : 'info', 'crontab');
         return ['err' => $code, 'msg' => $msg];

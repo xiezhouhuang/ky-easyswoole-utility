@@ -40,7 +40,7 @@ class CreateSubTable implements TaskInterface
      */
     public function run(int $taskId, int $workerIndex)
     {
-        if ( ! empty($this->data['operinfo'])) {
+        if (!empty($this->data['operinfo'])) {
             CtxRequest::getInstance()->withOperinfo($this->data['operinfo']);
         }
 
@@ -54,14 +54,14 @@ class CreateSubTable implements TaskInterface
 
     protected function doCreate($className = '')
     {
-        if ( ! class_exists($className)) {
+        if (!class_exists($className)) {
             return;
         }
 
         $data = $this->data['data'];
 
         $id = $data['id'];
-        if ( ! is_numeric($id)) {
+        if (!is_numeric($id)) {
             return;
         }
 
@@ -79,7 +79,7 @@ class CreateSubTable implements TaskInterface
         try {
             /** @var AbstractModel $model */
             $model = new $className([], $fullName, $id);
-            if ( ! $model instanceof AbstractModel) {
+            if (!$model instanceof AbstractModel) {
                 return;
             }
             $connectionName = $model->getConnectionName();
@@ -87,11 +87,9 @@ class CreateSubTable implements TaskInterface
             $builder = new QueryBuilder();
             $builder->raw("CREATE TABLE  IF NOT EXISTS `{$fullName}` LIKE `{$name}_0`;");
             DbManager::getInstance()->query($builder, true, $connectionName);
-        }
-        catch (\EasySwoole\Mysqli\Exception\Exception | \Throwable $e)
-        {
+        } catch (\EasySwoole\Mysqli\Exception\Exception | \Throwable $e) {
             $title = '创建分表失败';
-            wechat_notice($title, "$title [$connectionName . $fullName] : " . $e->getMessage());
+            wecom_text("$title [$connectionName . $fullName] : " . $e->getMessage());
             trace("$title [$connectionName . $fullName] : " . $e->getMessage(), 'error');
         }
     }

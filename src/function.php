@@ -10,8 +10,8 @@ use EasySwoole\ORM\DbManager;
 use EasySwoole\ORM\AbstractModel;
 use EasySwoole\ORM\Db\MysqliClient;
 
-use Kyzone\EsUtility\Notify\DingTalk\Message\Markdown;
-use Kyzone\EsUtility\Notify\DingTalk\Message\Text;
+use Kyzone\EsUtility\Notify\WeCom\Message\Markdown;
+use Kyzone\EsUtility\Notify\WeCom\Message\Text;
 use Kyzone\EsUtility\Notify\EsNotify;
 use Kyzone\EsUtility\Notify\WeChat\Message\Notice;
 use Kyzone\EsUtility\Notify\WeChat\Message\Warning;
@@ -431,10 +431,10 @@ if (!function_exists('wechat_warning')) {
 }
 
 
-if (!function_exists('dingtalk_text')) {
-    function dingtalk_text($content = '', $at = true)
+if (!function_exists('wecom_text')) {
+    function wecom_text($content = '', $at = true)
     {
-        EsNotify::getInstance()->doesOne('dingtalk', new Text([
+        EsNotify::getInstance()->doesOne('wecom', new Text([
             'content' => $content,
             'isAtAll' => $at
         ]));
@@ -442,12 +442,11 @@ if (!function_exists('dingtalk_text')) {
 }
 
 
-if (!function_exists('dingtalk_markdown')) {
-    function dingtalk_markdown($title = '', $text = '', $at = true)
+if (!function_exists('wecom_markdown')) {
+    function wecom_markdown($text = '', $at = true)
     {
-        EsNotify::getInstance()->doesOne('dingtalk', new Markdown([
-            'title' => $title,
-            'text' => $text,
+        EsNotify::getInstance()->doesOne('wecom', new Markdown([
+            'content' => $text,
             'isAtAll' => $at
         ]));
     }
