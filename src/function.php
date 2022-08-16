@@ -47,7 +47,7 @@ if (!function_exists('find_model')) {
         }
 
         foreach ($namespaces as $namespace) {
-            $className = rtrim($namespace, '\\') . '\\' . ucfirst($name);
+            $className = rtrim($namespace, '\\') . '\\' . ucfirst(parse_name($name, 1));
             if (class_exists($className)) {
                 return $className;
             }
