@@ -2,7 +2,6 @@
 
 namespace Kyzone\EsUtility\HttpController\Admin;
 
-use Kyzone\EsUtility\Common\Classes\Tree;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
 
 /**
@@ -35,14 +34,13 @@ trait AdminUserTrait
         return parent::__after_index($items, $total);
     }
 
-    public function getUserInfo()
+    public function _getUserInfo()
     {
         $avatar = $this->operinfo['avatar'] ?? '';
         // 客户端进入页,应存id
-        if (!empty($this->operinfo['extension']['homePath']))
-        {
-            $Tree = new Tree();
-            $homePage = $Tree->originData(['type' => [[0, 1], 'in']])->getHomePath($this->operinfo['extension']['homePath']);
+        if (!empty($this->operinfo['extension']['homePath'])) {
+            $Menu = model("admin_menu");
+            $homePage = $Menu->getHomePage($this->operinfo['extension']['homePath']);
         }
         $result = [
             'id' => $this->operinfo['id'],
@@ -77,6 +75,7 @@ trait AdminUserTrait
             $this->_edit();
         }
     }
+
     /**
      * 用户权限码
      */
@@ -95,8 +94,12 @@ trait AdminUserTrait
         if ($this->isHttpGet()) {
             // role的关联数据也可以不用理会，ORM会处理
             unset($userInfo['password'], $userInfo['role']);
-
-            $data = ['result' => $userInfo];
+            $menu = model('admin_menu');
+            $menuList = $menu->getTree(
+                ['type' => [[0, 1], 'in'], 'status' => 1],
+                ['filterIds' => $this->getUserMenus()]
+            );
+            $data = ['menuList' => $menuList, 'result' => $userInfo];
             return $return ? $data : $this->success($data);
         } elseif ($this->isHttpPost()) {
             $id = $this->post['id'];

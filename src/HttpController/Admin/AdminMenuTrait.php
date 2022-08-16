@@ -4,18 +4,17 @@
 namespace Kyzone\EsUtility\HttpController\Admin;
 
 
-use Kyzone\EsUtility\Common\Classes\Tree;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
 use Kyzone\EsUtility\Common\Http\Code;
+use Kyzone\EsUtility\Common\Languages\Dictionary;
 
 /**
  * Class Menu
- * @property \App\Model\Admin\AdminMneu $Model
+ * @property \App\Model\AdminMenu $Model
  * @package App\HttpController\Admin
  */
 trait AdminMenuTrait
 {
-
     public function index()
     {
         $input = $this->get;
@@ -28,7 +27,7 @@ trait AdminMenuTrait
             $where['status'] = $input['status'];
         }
 
-        $result = $this->Model->menuAll($where);
+        $result = $this->Model->getTree($where);
         $this->success($result);
     }
 
@@ -39,7 +38,7 @@ trait AdminMenuTrait
         if (!empty($name)) {
             $model = $this->Model->_clone();
             if ($model->where('name', $name)->count()) {
-                return $this->error("name重复", Code::ERROR_OTHER);
+                return $this->error("name 重复");
             }
         }
         return parent::_add($return);
@@ -54,7 +53,10 @@ trait AdminMenuTrait
         if (!is_null($userMenus) && empty($userMenus)) {
             throw new HttpParamException("对不起，没有权限");
         }
-        $menu = $this->Model->getRouter($userMenus);
+
+        $where = ['type' => [[0, 1], 'in'], 'status' => 1];
+        $options = ['isRouter' => true, 'filterIds' => $userMenus];
+        $menu = $this->Model->getTree($where, $options);
         return $return ? $menu : $this->success($menu);
     }
 
@@ -64,8 +66,7 @@ trait AdminMenuTrait
      */
     public function _treeList($return = false)
     {
-        $Tree = new Tree();
-        $treeData = $Tree->originData()->getTree();
+        $treeData = $this->Model->getTree();
         return $return ? $treeData : $this->success($treeData);
     }
 

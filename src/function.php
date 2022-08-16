@@ -19,7 +19,7 @@ use Kyzone\EsUtility\Common\Classes\LamJwt;
 use Kyzone\EsUtility\Common\Classes\Mysqli;
 
 
-if ( ! function_exists('is_super')) {
+if (!function_exists('is_super')) {
     /**
      * 是否超级管理员
      * @param $rid
@@ -33,7 +33,7 @@ if ( ! function_exists('is_super')) {
 }
 
 
-if ( ! function_exists('find_model')) {
+if (!function_exists('find_model')) {
     /**
      * @param $name
      * @param $thorw
@@ -42,7 +42,7 @@ if ( ! function_exists('find_model')) {
      */
     function find_model($name, $thorw = true)
     {
-        if ( ! $namespaces = config('MODEL_NAMESPACES')) {
+        if (!$namespaces = config('MODEL_NAMESPACES')) {
             $namespaces = ['\\App\\Model'];
         }
 
@@ -60,7 +60,7 @@ if ( ! function_exists('find_model')) {
     }
 }
 
-if ( ! function_exists('model')) {
+if (!function_exists('model')) {
     /**
      * 实例化Model
      * @param string $name Model名称
@@ -81,17 +81,11 @@ if ( ! function_exists('model')) {
 
         $name = parse_name($name, 1);
 
-        $gameid = '';
-        // 实例化XXX_gid模型
-        if (strpos($name, ':')) {
-            list($name, $gameid) = explode(':', $name);
-        }
-        $tableName = $gameid != '' ? parse_name($name, 0, false) . "_$gameid" : '';
 
         $className = find_model($space . $name);
 
         /** @var AbstractModel $model */
-        $model = new $className($data, $tableName, $gameid);
+        $model = new $className($data);
 
         // 注入连接(连接池连接)
         if (is_bool($inject) && $inject) {
@@ -100,8 +94,7 @@ if ( ! function_exists('model')) {
             $Client = DbManager::getInstance()->getConnection($connectName)->defer();
             $Client->connectionName($connectName);
             $model->setExecClient($Client);
-        }
-        // 注入连接(新连接) + 切换时区
+        } // 注入连接(新连接) + 切换时区
         else if (is_numeric($inject)) {
             // 请不要从连接池获取连接, 否则连接回收后会污染连接池
             $connectName = $model->getConnectionName();
@@ -116,33 +109,7 @@ if ( ! function_exists('model')) {
     }
 }
 
-if ( ! function_exists('model_admin')) {
-    /**
-     * @param string $name
-     * @param array $data
-     * @param bool|numeric $inject
-     * @return \EasySwoole\ORM\AbstractModel
-     */
-    function model_admin(string $name = '', array $data = [], $inject = false)
-    {
-        return model('Admin\\' . ucfirst($name), $data, $inject);
-    }
-}
-
-if ( ! function_exists('model_log')) {
-    /**
-     * @param string $name
-     * @param array $data
-     * @param bool|numeric $inject
-     * @return \EasySwoole\ORM\AbstractModel
-     */
-    function model_log(string $name = '', array $data = [], $inject = false)
-    {
-        return model('Log\\' . ucfirst($name), $data, $inject);
-    }
-}
-
-if ( ! function_exists('config')) {
+if (!function_exists('config')) {
     /**
      * 获取和设置配置参数
      * @param string|array $name 参数名
@@ -161,7 +128,7 @@ if ( ! function_exists('config')) {
 }
 
 
-if ( ! function_exists('trace')) {
+if (!function_exists('trace')) {
     /**
      * 记录日志信息，协程defer时写入
      * @param string|array $log log信息 支持字符串和数组
@@ -176,7 +143,7 @@ if ( ! function_exists('trace')) {
     }
 }
 
-if ( ! function_exists('trace_immediate')) {
+if (!function_exists('trace_immediate')) {
     /**
      * 记录日志信息,立即写入
      * @param string|array $log log信息 支持字符串和数组
@@ -190,7 +157,7 @@ if ( ! function_exists('trace_immediate')) {
 }
 
 
-if ( ! function_exists('defer_redis')) {
+if (!function_exists('defer_redis')) {
     /**
      * 返回redis句柄资源
      * @param string $poolname 标识
@@ -204,7 +171,7 @@ if ( ! function_exists('defer_redis')) {
 }
 
 
-if ( ! function_exists('parse_name')) {
+if (!function_exists('parse_name')) {
     /**
      * 字符串命名风格转换
      * @param string $name 字符串
@@ -226,7 +193,7 @@ if ( ! function_exists('parse_name')) {
 }
 
 
-if ( ! function_exists('array_merge_multi')) {
+if (!function_exists('array_merge_multi')) {
     /**
      * 多维数组合并（支持多数组）
      * @return array
@@ -251,13 +218,13 @@ if ( ! function_exists('array_merge_multi')) {
 }
 
 
-if ( ! function_exists('array_sort_multi')) {
+if (!function_exists('array_sort_multi')) {
     /**
      * 二维数组按某字段排序
      */
     function array_sort_multi($data = [], $field = '', $direction = SORT_DESC)
     {
-        if ( ! $data) return [];
+        if (!$data) return [];
         $arrsort = [];
         foreach ($data as $uniqid => $row) {
             foreach ($row as $key => $value) {
@@ -271,7 +238,7 @@ if ( ! function_exists('array_sort_multi')) {
     }
 }
 
-if ( ! function_exists('listdate')) {
+if (!function_exists('listdate')) {
     /**
      * 返回两个日期之间的具体日期或月份
      *
@@ -345,7 +312,7 @@ if ( ! function_exists('listdate')) {
 }
 
 
-if ( ! function_exists('difdate')) {
+if (!function_exists('difdate')) {
     /**
      * 计算两个日期相差多少天或多少月
      */
@@ -355,7 +322,7 @@ if ( ! function_exists('difdate')) {
         $endstamp = strtotime($endday);
 
         // 相差多少个月
-        if ( ! $d) {
+        if (!$d) {
             list($date_1['y'], $date_1['m']) = explode('-', date('Y-m', $beginstamp));
             list($date_2['y'], $date_2['m']) = explode('-', date('Y-m', $endstamp));
             return ($date_2['y'] - $date_1['y']) * 12 + $date_2['m'] - $date_1['m'];
@@ -367,20 +334,20 @@ if ( ! function_exists('difdate')) {
 }
 
 
-if ( ! function_exists('verify_token')) {
+if (!function_exists('verify_token')) {
     /**
      * 验证jwt并读取用户信息
      */
     function verify_token($orgs = [], $header = [], $key = 'uid')
     {
         $token = $header['HTTP_TOKEN'] ?? ($header['token'][0] ?? '');
-        if ( ! $token) {
+        if (!$token) {
             // invalid_verify_token
             return ['INVERTOKEN' => 1, 'code' => 401, 'msg' => '缺少token'];
         }
         // 验证JWT
         $jwt = LamJwt::verifyToken($token);
-        if ($jwt['status'] != 1 || ! isset($jwt['data'][$key]) || ! isset($orgs[$key]) || $jwt['data'][$key] != $orgs[$key]) {
+        if ($jwt['status'] != 1 || !isset($jwt['data'][$key]) || !isset($orgs[$key]) || $jwt['data'][$key] != $orgs[$key]) {
             return ['INVERTOKEN' => 1, 'code' => 400, 'msg' => 'jwt有误'];
         }
 
@@ -391,7 +358,7 @@ if ( ! function_exists('verify_token')) {
 }
 
 
-if ( ! function_exists('ip')) {
+if (!function_exists('ip')) {
     /**
      * 获取http客户端ip
      * @param null $Request
@@ -400,7 +367,7 @@ if ( ! function_exists('ip')) {
     function ip($Request = null)
     {
         // Request继承 \EasySwoole\Http\Message\Message 皆可
-        if ( ! $Request instanceof \EasySwoole\Http\Request) {
+        if (!$Request instanceof \EasySwoole\Http\Request) {
             $Request = \Kyzone\EsUtility\Common\Classes\CtxRequest::getInstance()->request;
             if (empty($Request)) {
                 return false;
@@ -411,14 +378,13 @@ if ( ! function_exists('ip')) {
 
         if (empty($ip)) {
             $servers = $Request->getServerParams();
-            if ( ! empty($servers['remote_addr'])) {
+            if (!empty($servers['remote_addr'])) {
                 $ip = $servers['remote_addr'];
             }
         }
 
         // 其中“;”为getHeaderLine拼接, “, ”为代理拼接
-        foreach ([';', ','] as $delimiter)
-        {
+        foreach ([';', ','] as $delimiter) {
             if (strpos($ip, $delimiter) !== false) {
                 $ip = trim(explode($delimiter, $ip)[0]);
             }
@@ -429,7 +395,7 @@ if ( ! function_exists('ip')) {
 }
 
 
-if ( ! function_exists('lang')) {
+if (!function_exists('lang')) {
     function lang($const = '')
     {
         return I18N::getInstance()->translate($const);
@@ -437,10 +403,10 @@ if ( ! function_exists('lang')) {
 }
 
 
-if ( ! function_exists('wechat_notice')) {
+if (!function_exists('wechat_notice')) {
     function wechat_notice($title = '', $content = '', $color = '#32CD32')
     {
-       EsNotify::getInstance()->doesOne('wechat', new Notice([
+        EsNotify::getInstance()->doesOne('wechat', new Notice([
             'templateId' => config('WX_TPLID.notice'),
             'title' => $title,
             'content' => $content,
@@ -450,10 +416,10 @@ if ( ! function_exists('wechat_notice')) {
 }
 
 
-if ( ! function_exists('wechat_warning')) {
+if (!function_exists('wechat_warning')) {
     function wechat_warning($file, $line, $servername, $message, $color = '#FF0000')
     {
-       EsNotify::getInstance()->doesOne('wechat', new Warning([
+        EsNotify::getInstance()->doesOne('wechat', new Warning([
             'templateId' => config('WX_TPLID.warning'),
             'file' => $file,
             'line' => $line,
@@ -465,7 +431,7 @@ if ( ! function_exists('wechat_warning')) {
 }
 
 
-if ( ! function_exists('dingtalk_text')) {
+if (!function_exists('dingtalk_text')) {
     function dingtalk_text($content = '', $at = true)
     {
         EsNotify::getInstance()->doesOne('dingtalk', new Text([
@@ -476,7 +442,7 @@ if ( ! function_exists('dingtalk_text')) {
 }
 
 
-if ( ! function_exists('dingtalk_markdown')) {
+if (!function_exists('dingtalk_markdown')) {
     function dingtalk_markdown($title = '', $text = '', $at = true)
     {
         EsNotify::getInstance()->doesOne('dingtalk', new Markdown([
@@ -488,7 +454,7 @@ if ( ! function_exists('dingtalk_markdown')) {
 }
 
 
-if ( ! function_exists('array_to_std')) {
+if (!function_exists('array_to_std')) {
     function array_to_std(array $array = [])
     {
         $func = __FUNCTION__;
@@ -501,7 +467,7 @@ if ( ! function_exists('array_to_std')) {
 }
 
 
-if ( ! function_exists('convertip')) {
+if (!function_exists('convertip')) {
     /**
      * 官方网站　 http://www.cz88.net　请适时更新ip库
      * 按照ip地址返回所在地区
@@ -517,14 +483,14 @@ if ( ! function_exists('convertip')) {
         if (is_numeric($ip)) {
             $ip = long2ip($ip);
         }
-        if ( ! $fd = @fopen($ipdatafile, 'rb')) {
+        if (!$fd = @fopen($ipdatafile, 'rb')) {
             return '- Invalid IP data file';
         }
 
         $ip = explode('.', $ip);
         $ipNum = $ip[0] * 16777216 + $ip[1] * 65536 + $ip[2] * 256 + $ip[3];
 
-        if ( ! ($DataBegin = fread($fd, 4)) || ! ($DataEnd = fread($fd, 4))) return;
+        if (!($DataBegin = fread($fd, 4)) || !($DataEnd = fread($fd, 4))) return;
         @$ipbegin = implode('', unpack('L', $DataBegin));
         if ($ipbegin < 0) $ipbegin += pow(2, 32);
         @$ipend = implode('', unpack('L', $DataEnd));
@@ -645,7 +611,7 @@ if ( ! function_exists('convertip')) {
 }
 
 
-if ( ! function_exists('area')) {
+if (!function_exists('area')) {
     /**
      * @param string $ip
      * @param int|null $num 为数字时返回地区数组中的一个成员；否则返回整个数组
@@ -677,7 +643,7 @@ if ( ! function_exists('area')) {
 }
 
 
-if ( ! function_exists('sysinfo')) {
+if (!function_exists('sysinfo')) {
     /**
      * 获取系统设置的动态配置
      * @document http://www.easyswoole.com/Components/Spl/splArray.html
@@ -691,12 +657,12 @@ if ( ! function_exists('sysinfo')) {
         /** @var SplArray $Spl */
         $Spl = RedisPool::invoke(function (Redis $redis) {
 
-            $model = model_admin('sysinfo');
+            $model = model('sysinfo');
 
             $redisKey = $model->getCacheKey();
 
             $cache = $redis->get($redisKey);
-            if ($cache !== false && ! is_null($cache)) {
+            if ($cache !== false && !is_null($cache)) {
                 $slz = unserialize($cache);
                 if ($slz instanceof SplArray) {
                     return $slz;
@@ -721,7 +687,7 @@ if ( ! function_exists('sysinfo')) {
 }
 
 
-if ( ! function_exists('array_merge_decode')) {
+if (!function_exists('array_merge_decode')) {
     /**
      * array_merge_decode
      * @param $array
@@ -740,7 +706,7 @@ if ( ! function_exists('array_merge_decode')) {
 }
 
 
-if ( ! function_exists('get_login_token')) {
+if (!function_exists('get_login_token')) {
     /**
      * 如果项目的token规则与此不同，请在项目中重写此函数
      * @param $id
@@ -748,7 +714,7 @@ if ( ! function_exists('get_login_token')) {
      */
     function get_login_token($id, $expire = null)
     {
-        if (is_null($expire) || ! is_numeric($expire)) {
+        if (is_null($expire) || !is_numeric($expire)) {
             $expire = config('auth.expire');
         }
         return LamJwt::getToken(['id' => $id], config('auth.jwtkey'), $expire);
@@ -756,7 +722,7 @@ if ( ! function_exists('get_login_token')) {
 }
 
 
-if ( ! function_exists('is_env')) {
+if (!function_exists('is_env')) {
     /**
      * 判断当前运行环境
      * @param $env dev|test|produce|...
@@ -768,7 +734,7 @@ if ( ! function_exists('is_env')) {
     }
 }
 
-if ( ! function_exists('memory_convert')) {
+if (!function_exists('memory_convert')) {
     /**
      * 转换内存单位
      * @param $bytes
@@ -783,8 +749,7 @@ if ( ! function_exists('memory_convert')) {
     }
 }
 
-if ( ! function_exists('json_decode_ext'))
-{
+if (!function_exists('json_decode_ext')) {
     /**
      * json_decode的加强版，自动将extension字段处理为数组类型
      * @param string $data
@@ -793,7 +758,7 @@ if ( ! function_exists('json_decode_ext'))
     function json_decode_ext($data = '')
     {
         $data = is_scalar($data) ? json_decode($data, true) : $data;
-        is_array($data) && isset($data['extension']) && ! is_array($data['extension']) && ($data['extension'] = json_decode($data['extension'], true));
+        is_array($data) && isset($data['extension']) && !is_array($data['extension']) && ($data['extension'] = json_decode($data['extension'], true));
         return $data;
     }
 }

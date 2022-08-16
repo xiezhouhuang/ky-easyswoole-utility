@@ -10,20 +10,20 @@ use Kyzone\EsUtility\Common\Classes\Tree;
  */
 trait AdminMenuModelTrait
 {
-	protected function setBaseTraitProtected()
-	{
-		$this->sort = ['sort' => 'asc', 'id' => 'desc'];
-	}
+    protected function setBaseTraitProtected()
+    {
+        $this->sort = ['sort' => 'asc', 'id' => 'desc'];
+    }
 
-	protected function setRedirectAttr($data, $alldata)
-	{
-		return $data ? '/' . ltrim($data, '/') : '';
-	}
+    protected function setRedirectAttr($data, $alldata)
+    {
+        return $data ? '/' . ltrim($data, '/') : '';
+    }
 
-	protected function setNameAttr($data, $alldata)
-	{
-		return ucfirst(ltrim($data, '/'));
-	}
+    protected function setNameAttr($data, $alldata)
+    {
+        return ucfirst(ltrim($data, '/'));
+    }
 
     // 如果是第一级路由，path必须以 / 开头
     protected function setPathAttr($data, $alldata)
@@ -35,54 +35,53 @@ trait AdminMenuModelTrait
         return $value;
     }
 
-	public function getRouter($userMenus = [])
-	{
-		$tree = new Tree($userMenus);
-		$where = [
-			'type' => [[0, 1], 'in'],
-			'status' => 1
-		];
-		$router = $tree->originData($where)->getTree(0, true);
-		return $router;
-	}
 
-	public function menuList($where = [])
-	{
-		$Tree = new Tree();
-		$where['status'] = 1;
-		$where['type'] = [[0, 1], 'in'];
-		return $Tree->originData($where)->getTree();
-	}
+    /**
+     * 菜单树
+     * @param $where
+     * @param array $options
+     * @return array
+     */
+    public function getTree($where = [], array $options = [])
+    {
+        if ($where) {
+            $this->where($where);
+        }
+        $data = $this->setOrder()->all();
+        $Tree = new Tree($options + ['data' => $data]);
+        return $Tree->treeData();
+    }
 
-	public function menuAll($where = [])
-	{
-		$Tree = new Tree();
-		return $Tree->originData($where)->getAll();
-	}
+    public function getHomePage($id)
+    {
+        $data = $this->where(['type' => [[0, 1], 'in']])->setOrder()->all();
+        $Tree = new Tree(['data' => $data, 'filterIds' => $id]);
+        return $Tree->getHomePage();
+    }
 
-	/**
-	 * 角色组权限码
-	 * @param int $rid
-	 * @return array
-	 * @throws \EasySwoole\Mysqli\Exception\Exception
-	 * @throws \EasySwoole\ORM\Exception\Exception
-	 * @throws \Throwable
-	 */
-	public function permCode($rid): array
-	{
-		$where = ['permission' => ['', '<>']];
+    /**
+     * 角色组权限码
+     * @param int $rid
+     * @return array
+     * @throws \EasySwoole\Mysqli\Exception\Exception
+     * @throws \EasySwoole\ORM\Exception\Exception
+     * @throws \Throwable
+     */
+    public function permCode($rid): array
+    {
+        $where = ['permission' => ['', '<>']];
 
-		if ( ! is_super($rid)) {
-			/** @var  \App\Model\Admin\AdminRole $Role */
-			$Role = model('admin_role');
-			$menuIds = $Role->where('id', $rid)->val('menu');
-			if (empty($menuIds)) {
-				return [];
-			}
+        if (!is_super($rid)) {
+            /** @var  \App\Model\Admin\AdminRole $Role */
+            $Role = model('admin_role');
+            $menuIds = $Role->where('id', $rid)->val('menu');
+            if (empty($menuIds)) {
+                return [];
+            }
 
-			$where['id'] = [explode(',', $menuIds), 'in'];
-		}
-		$permission = $this->where($where)->column('permission');
-		return is_array($permission) ? $permission : [];
-	}
+            $where['id'] = [explode(',', $menuIds), 'in'];
+        }
+        $permission = $this->where($where)->column('permission');
+        return is_array($permission) ? $permission : [];
+    }
 }
