@@ -219,7 +219,7 @@ class EventInitialize extends SplBean
                 CtxRequest::getInstance()->request = $request;
 
 
-                if (!is_null($this->httpTracker) && !Str::contains("HttpTracker", $request->getUri())) {
+                if (!is_null($this->httpTracker) && !Str::contains($request->getUri(), "HttpTracker")) {
                     $repeated = intval(stripos($request->getHeaderLine('user-agent'), ';HttpTracker') !== false);
                     // 开启链路追踪
                     $point = HttpTracker::getInstance($this->httpTrackerConfig)->createStart($this->httpTracker);
@@ -258,7 +258,7 @@ class EventInitialize extends SplBean
                     }
                 }
 
-                if (!is_null($this->httpTracker) && !Str::contains("HttpTracker", $request->getUri())) {
+                if (!is_null($this->httpTracker) && !Str::contains($request->getUri(), "HttpTracker")) {
                     $point = HttpTracker::getInstance()->startPoint();
                     $point && $point->setEndArg(HttpTracker::endArgsResponse($response))->end();
                 }
