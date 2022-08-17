@@ -10,6 +10,7 @@ use EasySwoole\Http\Response;
 use EasySwoole\ORM\DbManager;
 use EasySwoole\Spl\SplBean;
 use EasySwoole\Trigger\TriggerInterface;
+use EasySwoole\Utility\Str;
 use Kyzone\EsUtility\Common\Classes\CtxRequest;
 use Kyzone\EsUtility\Common\Classes\ExceptionTrigger;
 use Kyzone\EsUtility\Common\Classes\LamUnit;
@@ -108,7 +109,7 @@ class EventInitialize extends SplBean
     protected function registerConfig()
     {
         $dirs = $this->configDir;
-        if ( ! is_array($dirs)) {
+        if (!is_array($dirs)) {
             return;
         }
         foreach ($dirs as $dir) {
@@ -123,11 +124,10 @@ class EventInitialize extends SplBean
     protected function registerMysqlPool()
     {
         $config = $this->mysqlConfig;
-        if ( ! is_array($config)) {
+        if (!is_array($config)) {
             return;
         }
-        foreach ($config as $mname => $mvalue)
-        {
+        foreach ($config as $mname => $mvalue) {
             DbManager::getInstance()->addConnection(
                 new \EasySwoole\ORM\Db\Connection(new \EasySwoole\ORM\Db\Config($mvalue)),
                 $mname
@@ -144,11 +144,10 @@ class EventInitialize extends SplBean
     protected function registerRedisPool()
     {
         $config = $this->redisConfig;
-        if ( ! is_array($config)) {
+        if (!is_array($config)) {
             return;
         }
-        foreach ($config as $rname => $rvalue)
-        {
+        foreach ($config as $rname => $rvalue) {
             \EasySwoole\RedisPool\RedisPool::getInstance()->register(
                 new \EasySwoole\Redis\Config\RedisConfig($rvalue),
                 $rname
@@ -162,7 +161,7 @@ class EventInitialize extends SplBean
      */
     protected function registerMysqlOnQuery()
     {
-        if ( ! $this->mysqlOnQueryOpen) {
+        if (!$this->mysqlOnQueryOpen) {
             return;
         }
         DbManager::getInstance()->onQuery(
@@ -180,7 +179,7 @@ class EventInitialize extends SplBean
                 }
 
                 // 除非显示声明_save_log不记录日志
-                if (! isset($this->mysqlOnQueryFunc['_save_log']) || $this->mysqlOnQueryFunc['_save_log'] !== false) {
+                if (!isset($this->mysqlOnQueryFunc['_save_log']) || $this->mysqlOnQueryFunc['_save_log'] !== false) {
                     trace($sql, 'info', 'sql');
                 }
 
@@ -203,7 +202,7 @@ class EventInitialize extends SplBean
      */
     protected function registerHttpOnRequest()
     {
-        if ( ! $this->httpOnRequestOpen) {
+        if (!$this->httpOnRequestOpen) {
             return;
         }
         Di::getInstance()->set(
@@ -220,7 +219,7 @@ class EventInitialize extends SplBean
                 CtxRequest::getInstance()->request = $request;
 
 
-                if ( ! is_null($this->httpTracker)) {
+                if (!is_null($this->httpTracker) && !Str::contains("HttpTracker", $request->getUri())) {
                     $repeated = intval(stripos($request->getHeaderLine('user-agent'), ';HttpTracker') !== false);
                     // 开启链路追踪
                     $point = HttpTracker::getInstance($this->httpTrackerConfig)->createStart($this->httpTracker);
@@ -244,7 +243,7 @@ class EventInitialize extends SplBean
 
     protected function registerAfterRequest()
     {
-        if ( ! ($this->httpAfterRequestOpen || ! is_null($this->httpTracker))) {
+        if (!($this->httpAfterRequestOpen || !is_null($this->httpTracker))) {
             return;
         }
 
@@ -259,7 +258,7 @@ class EventInitialize extends SplBean
                     }
                 }
 
-                if ( ! is_null($this->httpTracker)) {
+                if (!is_null($this->httpTracker) && !Str::contains("HttpTracker", $request->getUri())) {
                     $point = HttpTracker::getInstance()->startPoint();
                     $point && $point->setEndArg(HttpTracker::endArgsResponse($response))->end();
                 }

@@ -22,7 +22,6 @@ class Index extends PointContext
 			'path' => $request->getUri()->getPath(),
 			'server_name' => config('SERVNAME'),
 			'header' => $request->getHeaders(),
-//            'server' => $request->getServerParams(),
 			'GET' => $request->getQueryParams(),
 			'POST' => $request->getParsedBody(),
             'JSON' => json_decode($request->getBody()->__toString(), true),
