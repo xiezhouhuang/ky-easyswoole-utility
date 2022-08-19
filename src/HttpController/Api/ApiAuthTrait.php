@@ -14,7 +14,10 @@ trait ApiAuthTrait
     protected string $sessionKey = "API/TOKEN:";
 
     protected array $_basicAction = [
-        '/api/user/login'
+        'api/user/login',
+        'api/user/wxLogin',
+        'api/user/aliLogin',
+        'api/user/wechatLogin'
     ];
     protected array $_noRequiredAction = [];
 
