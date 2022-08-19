@@ -21,8 +21,7 @@
     "easyswoole/log": ">=1.0",
     "easyswoole/policy": "^1.0",
     "easyswoole/file-watcher": "^1.0",
-    "easyswoole/tracker": "^1.1",
-    "viest/php-ext-xlswriter-ide-helper": "dev-master"
+    "easyswoole/tracker": "^1.1"
   },
   "autoload": {
     "psr-4": {
