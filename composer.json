@@ -21,7 +21,8 @@
     "easyswoole/log": ">=1.0",
     "easyswoole/policy": "^1.0",
     "easyswoole/file-watcher": "^1.0",
-    "easyswoole/tracker": "^1.1"
+    "easyswoole/tracker": "^1.1",
+    "easyswoole/verifycode": "3.x"
   },
   "autoload": {
     "psr-4": {
