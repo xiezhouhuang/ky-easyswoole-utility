@@ -402,6 +402,19 @@ if (!function_exists('lang')) {
     }
 }
 
+if (!function_exists('email_notice')) {
+    function email_notice($email = '', $name = '', $title = '', $content = '', $otherMail = '')
+    {
+        EsNotify::getInstance()->doesOne('email', new \Kyzone\EsUtility\Notify\Email\Message\Mail([
+            "title" => $title,
+            "content" => $content,
+            "email" => $email,
+            "name" => $name,
+            "otherMail" => $otherMail,
+        ]));
+    }
+}
+
 
 if (!function_exists('wechat_notice')) {
     function wechat_notice($title = '', $content = '', $color = '#32CD32')
