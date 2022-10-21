@@ -327,11 +327,11 @@ class EventMainServerCreate extends SplBean
         }
         ###### 注册 rpc 服务 ######
         /** rpc 服务端配置 */
-        $config = new \EasySwoole\Rpc\Config();
-        $config->setOnException(function (\Throwable $throwable) {
+        $rpcConfig = new \EasySwoole\Rpc\Config();
+        $rpcConfig->setOnException(function (\Throwable $throwable) {
             trace("PRC 失败 :" . $throwable->getMessage(), 'error');
         });
-        $serverConfig = $config->getServer();
+        $serverConfig = $rpcConfig->getServer();
         // 单机部署内部调用时可指定为 127.0.0.1
         // 分布式部署时多台调用时请填 0.0.0.0
         $serverConfig->setServerIp($config['service_ip'] ?? '127.0.0.1');
@@ -342,7 +342,7 @@ class EventMainServerCreate extends SplBean
         $serviceNode->setIp($config['host']);
         $serviceNode->setPort($config['port']);
         // rpc 具体配置请看配置章节
-        $rpc = new \EasySwoole\Rpc\Rpc($config);
+        $rpc = new \EasySwoole\Rpc\Rpc($rpcConfig);
         foreach ($config['service'] as $service) {
             // 添加服务到服务管理器中
             $serviceName = $service['name'] ?? '';
