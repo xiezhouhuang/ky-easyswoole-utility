@@ -22,7 +22,8 @@
     "easyswoole/policy": "^1.0",
     "easyswoole/file-watcher": "^1.0",
     "easyswoole/tracker": "^1.1",
-    "easyswoole/verifycode": "3.x"
+    "easyswoole/verifycode": "3.x",
+    "easyswoole/rpc": "5.x"
   },
   "autoload": {
     "psr-4": {

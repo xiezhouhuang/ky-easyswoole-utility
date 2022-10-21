@@ -6,9 +6,11 @@ use EasySwoole\Command\Color;
 use EasySwoole\EasySwoole\Command\Utility;
 use EasySwoole\EasySwoole\ServerManager;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
+use EasySwoole\Rpc\Service\AbstractService;
 use EasySwoole\Socket\AbstractInterface\ParserInterface;
 use EasySwoole\Spl\SplBean;
 use EasySwoole\Socket\Bean\Response;
+use Kyzone\EsUtility\Common\Classes\RpcUtils;
 use Kyzone\EsUtility\Notify\EsNotify;
 use Kyzone\EsUtility\Notify\Interfaces\ConfigInterface;
 
@@ -56,13 +58,7 @@ class EventMainServerCreate extends SplBean
     protected $consumerJobs = null;
 
     protected $notifyConfig = null;
-
-    protected function initialize(): void
-    {
-        if (is_null($this->notifyConfig)) {
-            $this->notifyConfig = config('ES_NOTIFY');
-        }
-    }
+    protected $rpcConfig = null;
 
     public function run()
     {
@@ -78,6 +74,7 @@ class EventMainServerCreate extends SplBean
         $this->registerConsumer();
         $this->watchHotReload();
         $this->registerNotify();
+        $this->registerRpc();
     }
 
     protected function registerWebSocketServer()
@@ -235,8 +232,7 @@ class EventMainServerCreate extends SplBean
     {
         $watchConfig = $this->hotReloadWatchDirs;
 
-        if ( ! is_env('dev') || ! is_array($watchConfig) || empty($watchConfig))
-        {
+        if (!is_env('dev') || !is_array($watchConfig) || empty($watchConfig)) {
             return;
         }
 
@@ -321,6 +317,54 @@ class EventMainServerCreate extends SplBean
                 trace("EsNotify 注册失败: $name");
             }
         }
+    }
+
+    protected function registerRpc()
+    {
+        $config = $this->rpcConfig;
+        if (!is_array($config)) {
+            return;
+        }
+        ###### 注册 rpc 服务 ######
+        /** rpc 服务端配置 */
+        $config = new \EasySwoole\Rpc\Config();
+        $config->setOnException(function (\Throwable $throwable) {
+            trace("PRC 失败 :" . $throwable->getMessage(), 'error');
+        });
+        $serverConfig = $config->getServer();
+        // 单机部署内部调用时可指定为 127.0.0.1
+        // 分布式部署时多台调用时请填 0.0.0.0
+        $serverConfig->setServerIp($config['service_ip'] ?? '127.0.0.1');
+        $serverConfig->setListenPort($config['listen_port'] ?? 9600);
+        $serverConfig->setListenAddress($config['listen_address'] ?? '0.0.0.0');
+        // 其他配置待定
+        $serviceNode = new \EasySwoole\Rpc\Server\ServiceNode();
+        $serviceNode->setIp($config['host']);
+        $serviceNode->setPort($config['port']);
+        // rpc 具体配置请看配置章节
+        $rpc = new \EasySwoole\Rpc\Rpc($config);
+        foreach ($config['service'] as $service) {
+            // 添加服务到服务管理器中
+            $serviceName = $service['name'] ?? '';
+            $moduleName = $service['module'] ?? '';
+            if ($serviceName && $moduleName) {
+                // 创建 服务
+                $serviceClass = new $serviceName;
+                if ($serviceClass instanceof AbstractService) {
+                    // 添加 Module 模块到服务中
+                    $moduleClass = new $moduleName;
+                    $serviceClass->addModule($moduleClass);
+                    $rpc->serviceManager()->addService($serviceClass);
+                }
+            }
+        }
+
+        // 此刻的rpc实例需要保存下来 或者采用单例模式继承整个Rpc类进行注册 或者使用Di
+        \EasySwoole\Component\Di::getInstance()->set(RpcUtils::RPC_KEY, $rpc);
+        \EasySwoole\Component\Di::getInstance()->set(RpcUtils::RPC_NODE, $serviceNode);
+
+        // 注册 rpc 服务
+        $rpc->attachServer(ServerManager::getInstance()->getSwooleServer());
     }
 
 }
