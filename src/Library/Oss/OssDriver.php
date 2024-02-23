@@ -16,25 +16,41 @@ class OssDriver
     public function __construct($file)
     {
         $config = sysinfo("UPLOAD_OSS", [
-            "method" => null,
-            "app_id" => "",
-            "app_secret" => "",
+            "method" => "local",
             "base_url" => "",
-            "bucket" => "",
-            "endpoint" => "",
-            "region" => ""
         ]);
         // 实例化当前存储引擎
         # 上传的方式
         $method = isset($config['method']) ? $config['method'] : "local";
         switch ($method) {
             case "tencent":
+                $config = sysinfo("TENCENT_OSS", [
+                    "app_id" => "",
+                    "secret_id" => "",
+                    "secret_key" => "",
+                    "base_url" => "",
+                    "bucket" => "",
+                    "region" => ""
+                ]);
                 $this->engine = new TencentUpload($config, $file);
                 break;
             case "aliyun":
+                $config = sysinfo("ALIYUN_OSS", [
+                    "access_key_id" => "",
+                    "access_key_secret" => "",
+                    "base_url" => "",
+                    "bucket" => "",
+                    "endpoint" => ""
+                ]);
                 $this->engine = new AliyunUpload($config, $file);
                 break;
             case "qiniu":
+                $config = sysinfo("QINIU_OSS", [
+                    "access" => "",
+                    "secret" => "",
+                    "base_url" => "",
+                    "bucket" => ""
+                ]);
                 $this->engine = new QiniuUpload($config, $file);
                 break;
             default:

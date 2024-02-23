@@ -21,8 +21,8 @@ class QiniuUpload extends UploadBasic
     {
 
         $bucket = $this->config['bucket'];
-        $access = $this->config['app_id'];
-        $secret = $this->config['app_secret'];
+        $access = $this->config['access'];
+        $secret = $this->config['secret'];
         $baseUrl = $this->config['base_url'];
         \EasySwoole\Oss\QiNiu\Config::setTimeout(30);
         \EasySwoole\Oss\QiNiu\Config::setConnectTimeout(30);

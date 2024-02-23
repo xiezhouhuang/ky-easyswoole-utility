@@ -2,6 +2,7 @@
 
 namespace Kyzone\EsUtility\Library\Oss;
 
+use Kyzone\EsUtility\Common\Classes\CtxRequest;
 use Kyzone\EsUtility\Common\Exception\HttpParamException;
 
 class LocalUpload extends UploadBasic
@@ -15,6 +16,10 @@ class LocalUpload extends UploadBasic
     {
 
         $baseUrl = $this->config['base_url'];
+        if ($baseUrl == "") {
+            $uri = CtxRequest::getInstance()->request->getUri();
+            $baseUrl = $uri->getScheme() . "://" . $uri->getAuthority() . "/ky-api";
+        }
         $dirname = "/uploads/" . date("Y") . "/" . date("m");
         $dir = EASYSWOOLE_ROOT . "/public/" . $dirname;
         //    需要检查目录是否存在，否则是写不进去的

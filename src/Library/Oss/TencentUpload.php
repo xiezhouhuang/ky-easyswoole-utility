@@ -13,11 +13,11 @@ class TencentUpload extends UploadBasic
         parent::__construct($config, $file);
 
         $region = $this->config['region'];
-        $arr = explode(",", $region);
+        $appId = $this->config['app_id'];
         $config = new \EasySwoole\Oss\Tencent\Config([
-            'appId' => sizeof($arr) == 2 ? $arr[1] : "",
-            'secretId' => $this->config['app_id'],
-            'secretKey' => $this->config['app_secret'],
+            'appId' => $appId,
+            'secretId' => $this->config['secret_id'],
+            'secretKey' => $this->config['secret_key'],
             'region' => $region,
             'bucket' => $this->config['bucket'],
         ]);

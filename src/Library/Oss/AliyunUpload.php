@@ -16,9 +16,9 @@ class AliyunUpload extends UploadBasic
 
         $bucket = $this->config['bucket'];
         $baseUrl = $this->config['base_url'];
-        $accessKeyId = $this->config['app_id'];
-        $accessKeySecret = $this->config['app_secret'];
-        $endpoint = $this->config['region'];
+        $accessKeyId = $this->config['accessKey_id'];
+        $accessKeySecret = $this->config['access_key_secret'];
+        $endpoint = $this->config['endpoint'];
         $config = new \EasySwoole\Oss\AliYun\Config([
             'accessKeyId' => $accessKeyId,
             'accessKeySecret' => $accessKeySecret,
